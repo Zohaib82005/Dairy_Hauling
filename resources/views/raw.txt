@@ -1,0 +1,437 @@
+<div class="col-lg-6">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="bi bi-truck me-2"></i>
+                                Delivery Route
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- User Location Section -->
+                            <div class="alert alert-info border-0 shadow-sm mb-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-geo-alt-fill text-info me-3 fs-4"></i>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">Your Current Location</h6>
+                                        <p id="userLocation" class="text-muted">Loading...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{ $found = false }}
+
+                            @foreach ($farmsInRoute as $index => $farm)
+                            <div class="d-none">
+                                {{ $found = true }}
+                            </div>
+                            @php
+                            $lat1 = $farm->latitude;
+                            $long1 = $farm->longitude;
+                            session()->put('lat1',$lat1);
+                            session()->put('long1',$long1);
+                            @endphp
+                            <!-- Route Stop Card -->
+                            <div class="card border-0 shadow-sm mb-4 position-relative overflow-hidden">
+                                <!-- Stop Number Badge -->
+                                <div class="position-absolute top-0 start-0 bg-success text-white px-3 py-1 rounded-end">
+                                    <small class="fw-bold">Stop {{ $index + 1 }}</small>
+                                </div>
+
+                                <div class="card-body pt-5">
+                                    <!-- Farm Name -->
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success rounded-circle p-2 me-3">
+                                            <i class="bi bi-arrow-right text-white"></i>
+                                        </div>
+                                        <h5 class="mb-0 fw-bold text-dark">{{ $farm->fname }}</h5>
+                                    </div>
+
+                                    <!-- Location Display -->
+                                    <div class="bg-light rounded p-3 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <i class="bi bi-geo-alt text-primary me-2 mt-1"></i>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-2 text-primary fw-semibold">Farm Location</h6>
+                                                <div class="bg-dark text-white p-3 rounded">
+                                                    <span id="location-{{ $index }}" class="small">
+                                                        <i class="bi bi-hourglass-split me-2"></i>Loading address...
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{-- {{ dd($ticketID); }} --}}
+                                    <!-- Action Button -->
+                                    <div class="d-grid">
+                                        <a class="btn btn-success btn-lg shadow-sm" href="{{ route('view.farm.stop',['id' => $farm->farmid, 'ticketID' => $ticketID]) }}">
+                                            <i class="bi bi-plus-circle me-2"></i>
+                                            Add Farm Stop
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Route Connector (except for last item) -->
+                            @if (!$loop->last)
+                            <div class="text-center mb-4">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="bg-primary" style="width: 3px; height: 30px;"></div>
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                                        <i class="bi bi-arrow-down text-white" style="font-size: 10px;"></i>
+                                    </div>
+                                    <div class="bg-primary" style="width: 3px; height: 30px;"></div>
+                                </div>
+                            </div>
+                            @endif
+                            <input type="hidden" value="{{ $farm->farmid }}" id="farmid">
+                            <!-- Hidden inputs for coordinates -->
+                            <input type="hidden" id="lat-{{ $index }}" value="{{ $farm->latitude }}">
+                            <input type="hidden" id="long-{{ $index }}" value="{{ $farm->longitude }}">
+
+                            <!-- Location fetching script -->
+                            <script>
+                                (function() {
+                                    const locationElement = document.getElementById("location-{{ $index }}");
+                                    const lat = document.getElementById("lat-{{ $index }}").value;
+                                    const lon = document.getElementById("long-{{ $index }}").value;
+
+                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            locationElement.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
+                                            // console.log(data.display_name);
+                                        })
+                                        .catch(err => {
+                                            locationElement.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
+                                            locationElement.parentElement.classList.remove('bg-dark');
+                                            locationElement.parentElement.classList.add('bg-danger');
+                                        });
+                                })();
+                            </script>
+                           
+                                
+                           @endforeach
+                           {{-- @if($tickets->platitude != null) --}}
+                            @php
+                            $lat2 = $tickets->platitude;
+                            $long2 = $tickets->plongitude;
+                            $lat1 = session('lat1');
+                            $long1 = session('long1');
+
+                            function distanceBtw($lat1, $lon1, $lat2, $lon2) {
+                            $R = 6371; // Earth's radius in km
+
+                            $lat1 = deg2rad($lat1);
+                            $lon1 = deg2rad($lon1);
+                            $lat2 = deg2rad($lat2);
+                            $lon2 = deg2rad($lon2);
+
+                            $dlat = $lat2 - $lat1;
+                            $dlon = $lon2 - $lon1;
+
+                            $a = sin($dlat / 2) * sin($dlat / 2) +
+                            cos($lat1) * cos($lat2) *
+                            sin($dlon / 2) * sin($dlon / 2);
+
+                            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                            return $R * $c;
+                            }
+
+                            $speed = 70;
+                            $distance = distanceBtw($lat1, $long1, $lat2, $long2); // km
+
+                            $timeInHours = $distance / $speed;
+                            $totalSeconds = $timeInHours * 3600;
+
+                            $hours = floor($totalSeconds / 3600);
+                            $minutes = floor(($totalSeconds % 3600) / 60);
+                            $seconds = floor($totalSeconds % 60);
+
+                            $formattedTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
+                            session()->put('arrivalTime', $formattedTime);
+
+                            @endphp
+                            {{-- @endif --}}
+
+                            <!-- No Route Message -->
+                            @if (!$found)
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 4rem;"></i>
+                                </div>
+                                <div class="alert alert-warning border-0 shadow-sm">
+                                    <h5 class="alert-heading mb-2">No Route Defined</h5>
+                                    {{-- <p class="mb-0">Please define a delivery route to get started.</p> --}}
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
+                        {{-- <div class="card-footer bg-light border-0 text-center" id="plantReading">
+            <a class="btn btn-outline-success btn-lg px-5" href="{{ route('view.scaleAtPlant',$ticketID) }}">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Add Reading At Plant
+                        </a>
+                    </div> --}}
+                    <div>
+                        <h6>Your Estimated Arrival Time at Plant should be: {{session('arrivalTime')}}</h6>
+                        <div class="card-footer bg-light border-0 text-center">
+                            <a class="btn btn-outline-success btn-lg px-5 " onclick="showAlert()" href="{{ route('destinationPlant',['ticketID' => $ticketID, 'routeID' =>$tickets->rid ]) }}">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Close Route
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer -->
+                    {{-- <div class="card-footer bg-light border-0 text-center">
+            <a class="btn btn-outline-success btn-lg px-5" href="{{ route('close.route',$ticketID) }}">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Close Route
+                    </a>
+                </div> --}}
+            </div>
+        </div>
+        <div class="col-lg-6 border rounded shadow-lg p-4">
+            <h5 class="text-center">Ticket Details</h5>
+
+            <h6>Ticket Number: </h6>
+            <p>{{$tickets->ticket_number}}</p>
+            <h6>Hauler Name: </h6>
+            <p>{{$tickets->hname}}</p>
+            <h6>Shipment Number:</h6>
+            <p>{{$tickets->shipp_number}}</p>
+            <h6>Truck:</h6>
+            <p>{{$tickets->truckID}}</p>
+            <h6>Trailer:</h6>
+            <p>{{$tickets->trailerID}}</p>
+            <h6>Total Capacity</h6>
+            <p>{{$tickets->capacity}} lbs</p>
+
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+                <div class="container bg-success p-3 text-white rounded">
+                    <div class="col-12 text-white">
+                        {{-- {{ dd($tanks); }} --}}
+                        <form action="{{ route('show.tank',$farm->id) }}" method="get">
+                            <h6 for="tankID" class="text-white">Please Select Tank</h6>
+                            <select name="tankId" id="tankID" onchange="this.form.submit();" class="form-control">
+                                <option selected disabled>--Please Select Tank--</option>
+                                @foreach ($tanks as $tanki)
+
+                                <option value="{{ $tanki->tankid }}">{{$tanki->tank_id}}</option>
+                                @endforeach
+                            </select>
+                            <input type="hidden" name="ticketID" value="{{ $ticketID }}">
+                        </form>
+                    </div>
+
+                    @if (isset($oneTank))
+                    <div class="my-2 text-center bg-dark p-2 rounded text-white">
+                        <h6 class="text-white">Tank: {{$oneTank->tank_id}}</h6>
+                        <h6 class="text-white">Tank Type: {{$oneTank->type}}</h6>
+
+
+                        {{-- <h6>Tank Total Capacity: {{$tank->capacity}}</h6> --}}
+                        <input type="hidden" name="" value="{{ $oneTank->type }}" id="tankType">
+                        <input type="hidden" name="" value="{{ $oneTank->height }}" id="tankHeight">
+                        <input type="hidden" name="" value="{{ $oneTank->width }}" id="tankWidth">
+                        <input type="hidden" name="" value="{{ $oneTank->radius }}" id="tankRadius">
+                        <input type="hidden" name="" value="{{ $oneTank->length }}" id="tankLength">
+
+                    </div>
+                    {{-- <h6 class="my-2">Total Capacity of Tank {{$tank->tank_id}} = {{$tank->capacity}}</h6> --}}
+                    {{-- {{ $tank->capacity }} --}}
+
+
+
+                    <div class="border my-2 shadow-lg rounded p-2">
+                        <h5 class="text-center text-white">Measure The Quantity of Milk Collected</h5>
+                        <select name="measurement_method" id="method" onchange="selectMethod()" class="form-control">
+                            <option diabled>--Select Measurement Method</option>
+                            <option value="Stick Reading">Stick Reading</option>
+                            <option value="Scale At Farm">Scale At Farm</option>
+                            <option value="Scale At Plant">Scale At Plant</option>
+                            <option value="Estimated Value">Estimated Values</option>
+                        </select>
+
+
+                        <div class="col-12" id="sr">
+                            <label for="startReading">Enter start reading</label>
+                            <input type="number" name="startReading" required id="startReading" class="form-control">
+
+                        </div>
+                        <div class="col-12" id="er">
+                            <label for="endReading">Enter End Reading</label>
+                            <input type="number" name="endReading" required id="endReading" class="form-control">
+                            <div class="text-center my-2">
+                                <button onclick="calculateStickReadings()" class="btn btn-danger">Calculate</button>
+                            </div>
+                        </div>
+                        <div class="col-12" id="scr">
+                            <label for="scaleReading">Enter Scale Values</label>
+                            <input type="number" name="scaleReading" id="scaleReading" class="form-control">
+                            <div class="text-center my-2">
+                                <button onclick="calaculateScaleReadings()" class="btn btn-danger">Calculate</button>
+                            </div>
+                        </div>
+                        <div class="col-12" id="ev">
+                            <label for="estimatedReading">Enter Estimated Values</label>
+                            <input type="number" name="estimatedReading" id="estimatedReading" class="form-control">
+                            <div class="text-center my-2">
+                                <button onclick="calculateEstimatedValue()" class="btn btn-danger">Calculate</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-center text-white">Collected Milk: <span id="collectedMilk"></span> lbs</h6>
+                </div>
+            </div>
+            <form action="{{ route('add.farm.stop') }}" method="POST">
+                @csrf
+                <input type="hidden" name="farm_id" value="{{ $farm->id }}">
+
+                {{-- {{ dd($oneTank->tank_id); }} --}}
+                <input type="hidden" name="tank_id" value="{{ $oneTank->id }}">
+                <input type="hidden" name="tracking_id" value="{{ Illuminate\Support\Str::random(5) }}">
+                <input type="hidden" name="calculated_milk" value="" id="colMilk">
+                <input type="hidden" name="method" id="meth" value="">
+                <input type="hidden" name="ticketID" value="{{ $ticketID }}">
+                <div class="text-center">
+                    <button class="btn btn-success my-2">Mark As Collected</button>
+                </div>
+            </form>
+            @endif
+            {{-- {{ dd($ticketID); }} --}}
+        </div>
+    </div>
+
+
+     <script>
+        let farmid = document.getElementById("farmid").value;
+        localStorage.setItem("farmid", farmid);
+        document.getElementById("sr").style.display = "none";
+        document.getElementById("er").style.display = "none";
+        document.getElementById("ev").style.display = "none";
+        document.getElementById("scr").style.display = "none";
+        let collectedMilk = document.getElementById("collectedMilk");
+        let colMilk = document.getElementById("colMilk");
+        let scaleReading;
+        let meth = document.getElementById("meth");
+
+        function selectMethod() {
+            let method = document.getElementById("method").value;
+            meth.value = method;
+
+            // console.log(meth.value);
+            if (method == "Stick Reading") {
+                document.getElementById("sr").style.display = "block";
+                document.getElementById("er").style.display = "block";
+                document.getElementById("ev").style.display = "none";
+                document.getElementById("scr").style.display = "none";
+                localStorage.clear();
+                collectedMilk.innerHTML = "";
+            } else if (method == "Scale At Farm") {
+                document.getElementById("sr").style.display = "none";
+                document.getElementById("er").style.display = "none";
+                document.getElementById("ev").style.display = "none";
+                document.getElementById("scr").style.display = "block";
+                localStorage.clear();
+                collectedMilk.innerHTML = "";
+            } else if (method == "Estimated Value") {
+                document.getElementById("sr").style.display = "none";
+                document.getElementById("er").style.display = "none";
+                document.getElementById("ev").style.display = "block";
+                document.getElementById("scr").style.display = "none";
+                localStorage.clear();
+                collectedMilk.innerHTML = "";
+            } else if (method == "Scale At Plant") {
+                document.getElementById("sr").style.display = "none";
+                document.getElementById("er").style.display = "none";
+                document.getElementById("ev").style.display = "none";
+                document.getElementById("scr").style.display = "none";
+                localStorage.setItem("scaleReadingAtPlant", "Yes");
+                collectedMilk.innerHTML = "You Will have to Enter The Reading At Plant";
+                colMilk.value = 0;
+                localStorage.setItem('milk', 0);
+            }
+        }
+
+        let tankType = document.getElementById("tankType").value;
+        let tankRadius;
+        let tankWidth, tankHeight, tankLength, volume;
+
+        if (tankType) {
+            if (tankType == "rectangular") {
+                tankWidth = document.getElementById("tankWidth").value;
+                tankHeight = document.getElementById("tankHeight").value;
+                tankLength = document.getElementById("tankLength").value;
+                // console.log(tankLength);
+
+            } else if (tankType == "cylindrical") {
+                tankHeight = document.getElementById("tankHeight").value;
+                tankRadius = document.getElementById("tankRadius").value;
+            }
+        }
+
+        function calculateStickReadings() {
+
+            let startReading = document.getElementById("startReading").value;
+            let endReading = document.getElementById("endReading").value;
+            tankHeight = parseFloat(document.getElementById("tankHeight").value);
+            if (startReading > tankHeight) {
+                alert("Start reading can't be greater than tank's height");
+                return;
+            }
+            if (startReading < endReading) {
+                alert("Please Enter The Valid Value");
+                return;
+            } else {
+                let height = startReading - endReading;
+
+                if (tankType == "rectangular") {
+                    // console.log(tankWidth);
+                    // console.log(tankLength);
+                    // console.log(height);
+                    volume = ((tankWidth * height * tankLength) * 7.48) * 8.6;
+                    collectedMilk.innerHTML = volume;
+                    colMilk.value = volume;
+                } else if (tankType == "cylindrical") {
+                    volume = ((3.14 * tankRadius * tankRadius * height) * 8.6) / 231;
+                    collectedMilk.innerHTML = volume;
+                    colMilk.value = volume;
+                    localStorage.setItem('milk', volume);
+                }
+            }
+
+        }
+
+        function calaculateScaleReadings() {
+            scaleReading = document.getElementById("scaleReading").value;
+            collectedMilk.innerHTML = scaleReading;
+            colMilk.value = scaleReading;
+            localStorage.setItem('milk', scaleReading);
+        }
+
+        function calculateEstimatedValue() {
+            let estimatedValue = document.getElementById("estimatedReading").value;
+            collectedMilk.innerHTML = estimatedValue;
+            colMilk.value = estimatedValue;
+            localStorage.setItem('milk', estimatedValue);
+        }
+
+        
+    </script>

@@ -335,7 +335,7 @@ class AdminController extends Controller
     public function editTank($id)
     {
         $tank = Tank::join('farms', 'tanks.farm_id', '=', 'farms.id')
-            ->select('tanks.id as tankid', 'farms.name as tfname', 'tank_id', 'farms.farm_id as tankFarmId', 'type', 'capacity', 'width', 'radius', 'height', 'length')
+            ->select('tanks.id as tankid', 'farms.name as tfname','farms.id as fid', 'tank_id', 'farms.farm_id as tankFarmId', 'type', 'capacity', 'width', 'radius', 'height', 'length')
             ->where('tanks.id', $id)
             ->first();
         $farms = Farm::select('id', 'name', 'farm_id')->get();

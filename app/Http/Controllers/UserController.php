@@ -243,7 +243,7 @@ class UserController extends Controller
             ->join('trucks', 'tickets.truck_id', '=', 'trucks.id')
             ->join('trailers', 'tickets.trailer_id', '=', 'trailers.id')
             ->join('plants','routes.destination_plant','=','plants.id')
-            ->select('tickets.id as tkid', 'ticket_number', 'routes.id as rid','plants.latitude as platitude','plants.longitude as plongitude', 'status', 'route_number', 'ticket_number', 'haulers.name as hname', 'shipp_number', 'trucks.truck_id as truckID', 'trailers.trailer_id as trailerID', 'capacity')
+            ->select('tickets.id as tkid','pickup_date', 'ticket_number', 'routes.id as rid','plants.latitude as platitude','plants.longitude as plongitude', 'status', 'route_number', 'ticket_number', 'haulers.name as hname', 'shipp_number', 'trucks.truck_id as truckID', 'trailers.trailer_id as trailerID', 'capacity')
             ->where('tickets.user_id', Auth::user()->id)
             ->where('tickets.status', 'active')
             ->where('tickets.id', $ticketID)
@@ -254,22 +254,29 @@ class UserController extends Controller
         return view('viewRoutes', compact('farmsInRoute', 'tickets', 'ticketID'));
     }
 
-    public function viewFarmStopDetails($id, $ticketID)
+    public function viewFarmStopDetails($ticketID)
     {
-        $farm = Farm::select('id', 'name', 'farm_id', 'patron_id')->where('id', $id)->first();
+        $farm = Farm::select('id', 'name', 'farm_id', 'patron_id')->first();
         $ticketFarm = Farm_stop_scan::where('user_id', Auth::user()->id)
             ->where('ticket_id', $ticketID)
             ->pluck('tank_id')
             ->toArray();
 
-        $tanks = Tank::select('id as tankid', 'tank_id', 'type', 'height', 'radius', 'width', 'length', 'capacity')
-            ->where('farm_id', $id)
+        $tans = Tank::select('id as tankid', 'tank_id', 'type', 'height', 'radius', 'width', 'length', 'capacity')
             ->whereNotIn('id', $ticketFarm)
             ->get();
 
-
-        
-        return view('addFarmStop', compact('farm', 'tanks', 'ticketID'));
+        $farms = Farm::join('routes','farms.route_id','=','routes.id')
+                ->join('haulers','haulers.id','=','routes.hauler_id')
+                ->join('users','haulers.id','=','users.hauler_id')
+                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','latitude','longitude')
+                ->where('haulers.id',Auth::user()->hauler_id)
+                ->where('users.id',Auth::user()->id)
+                ->get();
+        // dd($farms);
+       
+        // dd($tanks);
+        return view('addFarmStop', compact('farm',  'ticketID'));
     }
 
     public function showTank(Request $request, $farmID)
@@ -405,9 +412,6 @@ class UserController extends Controller
         Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
-
-
-
     public function sendPdf()
     {
         
@@ -421,5 +425,35 @@ class UserController extends Controller
         $pdf = Pdf::loadView('pdfsend', $data);
 
         return $pdf->stream('userprogress.pdf');
+    }
+
+    public function checkData(Request $request){
+        $farms = Farm::join('routes','farms.route_id','=','routes.id')
+                ->join('haulers','haulers.id','=','routes.hauler_id')
+                ->join('users','haulers.id','=','users.hauler_id')
+                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','latitude','longitude')
+                ->where('haulers.id',Auth::user()->hauler_id)
+                ->where('users.id',Auth::user()->id)
+                ->get();
+         $tanks = Tank::join('farms','tanks.farm_id','=','farms.id')
+                 ->join('routes','farms.route_id','=','routes.id')
+                 ->join('haulers','haulers.id','=','routes.hauler_id')
+                 ->join('users','haulers.id','=','users.hauler_id')
+                 ->select('tanks.id as tid','tanks.tank_id as tankID','length','radius','width','height','type')
+                 ->where('haulers.id',Auth::user()->hauler_id)
+                 ->where('users.id',Auth::user()->id)
+                 ->get();   
+        foreach($farms as $farm){
+            if($farm->farmID == $request->farmId && $farm->farmPtrID == $request->patronId){
+                foreach($tanks as $tank){
+                    if($tank->tankID == $request->tankId){
+
+                        return response()->json(['data'=> "Found",]);
+                    }
+                }
+            }
+        }
+
+                return response()->json(['data'=> " not Found"]);
     }
 }

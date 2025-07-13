@@ -13,7 +13,6 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 
 
     <!-- Template Javascript -->
@@ -32,23 +31,28 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.20/dist/index.js"></script>
     <!-- Template Stylesheet -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <style>
+         .scanner-container {
+            border: 2px solid #28a745;
+            border-radius: 0.375rem;
+            overflow: hidden;
+        }
+    </style>
  
 </head>
 
 <body>
-    <div class="d-none">
-        {{$randNumber = rand(100,999); }}
-        {{ $str = Illuminate\Support\Str::random(3); }}
-        {{ $ticketNumber = $str . $randNumber }}
-    </div>
+   
     <!-- Spinner Start -->
-    <div id="spinner"
+    {{-- <div id="spinner"
         class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-    </div>
+    </div> --}}
     <!-- Spinner End -->
 
     <!-- Topbar Start -->
@@ -72,8 +76,8 @@
         </div>
     </div>
     <!-- Topbar End -->
-    <p class="p-3">Home/Dashboard/View Route/Verify Farm</p>
-    <h3 class="p-3">Verify The Farm </h3>
+    <p class="p-3">Home/Dashboard/View Ticket/Add farm Stop
+   
     <div class="container my-3">
         <div class="container">
             @if ($errors->any())
@@ -84,120 +88,35 @@
 
             @endif
             <div class="container">
-                <h5 class="text-center">Please Verify the Farm</h5>
-                <div class="container">
-                    <div class="container">
-                        <div class="border my-2 rounded p-2">
-                            <h6>Name:</h6>
-                            <p>{{$farm->name}}</p>
-                            <input type="hidden" value="{{ $farm->id }}" id="farmid">
-                        </div>
-                        <div class="border my-2 rounded p-2">
-                            <h6>Farm ID:</h6>
-                            <p>{{$farm->farm_id}}</p>
-                        </div>
-                        <div class="border my-2 rounded p-2">
-                            <h6>Patron ID:</h6>
-                            <p>{{$farm->patron_id}}</p>
-                        </div>
-                    </div>
+                <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Scan Barcode</h5>
+                <div class="scanner-container mb-3">
+                    <video id="scanner-video" autoplay playsinline style="width: 100%; height: 300px;"></video>
                 </div>
-
-                <div class="container bg-success p-3 text-white rounded">
-                    <div class="col-12 text-white">
-                        {{-- {{ dd($tanks); }} --}}
-                        <form action="{{ route('show.tank',$farm->id) }}" method="get">
-                            <h6 for="tankID" class="text-white">Please Select Tank</h6>
-                            <select name="tankId" id="tankID" onchange="this.form.submit();" class="form-control">
-                                <option selected disabled>--Please Select Tank--</option>
-                                @foreach ($tanks as $tanki)
-
-                                <option value="{{ $tanki->tankid }}">{{$tanki->tank_id}}</option>
-                                @endforeach
-                            </select>
-                            <input type="hidden" name="ticketID" value="{{ $ticketID }}">
-                        </form>
-                    </div>
-
-                    @if (isset($oneTank))
-                    <div class="my-2 text-center bg-dark p-2 rounded text-white">
-                        <h6 class="text-white">Tank: {{$oneTank->tank_id}}</h6>
-                        <h6 class="text-white">Tank Type: {{$oneTank->type}}</h6>
-
-
-                        {{-- <h6>Tank Total Capacity: {{$tank->capacity}}</h6> --}}
-                        <input type="hidden" name="" value="{{ $oneTank->type }}" id="tankType">
-                        <input type="hidden" name="" value="{{ $oneTank->height }}" id="tankHeight">
-                        <input type="hidden" name="" value="{{ $oneTank->width }}" id="tankWidth">
-                        <input type="hidden" name="" value="{{ $oneTank->radius }}" id="tankRadius">
-                        <input type="hidden" name="" value="{{ $oneTank->length }}" id="tankLength">
-
-                    </div>
-                    {{-- <h6 class="my-2">Total Capacity of Tank {{$tank->tank_id}} = {{$tank->capacity}}</h6> --}}
-                    {{-- {{ $tank->capacity }} --}}
-
-
-
-                    <div class="border my-2 shadow-lg rounded p-2">
-                        <h5 class="text-center text-white">Measure The Quantity of Milk Collected</h5>
-                        <select name="measurement_method" id="method" onchange="selectMethod()" class="form-control">
-                            <option diabled>--Select Measurement Method</option>
-                            <option value="Stick Reading">Stick Reading</option>
-                            <option value="Scale At Farm">Scale At Farm</option>
-                            <option value="Scale At Plant">Scale At Plant</option>
-                            <option value="Estimated Value">Estimated Values</option>
-                        </select>
-
-
-                        <div class="col-12" id="sr">
-                            <label for="startReading">Enter start reading</label>
-                            <input type="number" name="startReading" required id="startReading" class="form-control">
-
-                        </div>
-                        <div class="col-12" id="er">
-                            <label for="endReading">Enter End Reading</label>
-                            <input type="number" name="endReading" required id="endReading" class="form-control">
-                            <div class="text-center my-2">
-                                <button onclick="calculateStickReadings()" class="btn btn-danger">Calculate</button>
-                            </div>
-                        </div>
-                        <div class="col-12" id="scr">
-                            <label for="scaleReading">Enter Scale Values</label>
-                            <input type="number" name="scaleReading" id="scaleReading" class="form-control">
-                            <div class="text-center my-2">
-                                <button onclick="calaculateScaleReadings()" class="btn btn-danger">Calculate</button>
-                            </div>
-                        </div>
-                        <div class="col-12" id="ev">
-                            <label for="estimatedReading">Enter Estimated Values</label>
-                            <input type="number" name="estimatedReading" id="estimatedReading" class="form-control">
-                            <div class="text-center my-2">
-                                <button onclick="calculateEstimatedValue()" class="btn btn-danger">Calculate</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h6 class="text-center text-white">Collected Milk: <span id="collectedMilk"></span> lbs</h6>
-                </div>
-            </div>
-            <form action="{{ route('add.farm.stop') }}" method="POST">
-                @csrf
-                <input type="hidden" name="farm_id" value="{{ $farm->id }}">
-
-                {{-- {{ dd($oneTank->tank_id); }} --}}
-                <input type="hidden" name="tank_id" value="{{ $oneTank->id }}">
-                <input type="hidden" name="tracking_id" value="{{ Illuminate\Support\Str::random(5) }}">
-                <input type="hidden" name="calculated_milk" value="" id="colMilk">
-                <input type="hidden" name="method" id="meth" value="">
-                <input type="hidden" name="ticketID" value="{{ $ticketID }}">
                 <div class="text-center">
-                    <button class="btn btn-success my-2">Mark As Collected</button>
+                    <div id="result" class="text-center d-inline ">Scanning...</div>
                 </div>
-            </form>
-            @endif
-            {{-- {{ dd($ticketID); }} --}}
+              
+                    <input type="hidden" value="" id="tracking_id" name="tracking_id">
+                    <input type="hidden" value="" id="farm_id" name="farm_id">
+                    <input type="hidden" value="" id="tank_id" name="tank_id">
+                    <input type="hidden" value="" id="patron_id" name="patron_id" > 
+                   <button type="submit" class="btn btn-success float-right" id="checkBtn">Stop Scan</button>
+               
+                
+
+            </div>
+        </div>
+
+                </div>
         </div>
     </div>
+    
+    <div class="container">
+
+    </div>
+
     <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
@@ -263,179 +182,96 @@
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top"><i
-            class="bi bi-arrow-up"></i></a>
+            class="bi bi-arrow-up"></i>
+    </a>
 
 
 
+        <script>
+            // document.getElementById("result").style.display = "none";
+            let result = "TR02FARM001TANK001PTR445";
+            let trackingID = "", farmID = "", tankID = "", patronID = "";
+            let track = document.getElementById("tracking_id");
+            let farm = document.getElementById("farm_id");
+            let tank = document.getElementById("tank_id");
+            let patron = document.getElementById("patron_id");
 
+    document.addEventListener("DOMContentLoaded", async function () {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Camera not supported on this device/browser.");
+        return;
+    }
+        const video = document.getElementById("scanner-video");
+            video.srcObject = await navigator.mediaDevices.getUserMedia({
+                video:  { facingMode: 'environment' }
+            });
 
+            const barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'upc_a'] });
 
-    <script>
-        let farmid = document.getElementById("farmid").value;
-        localStorage.setItem("farmid", farmid);
-        document.getElementById("sr").style.display = "none";
-        document.getElementById("er").style.display = "none";
-        document.getElementById("ev").style.display = "none";
-        document.getElementById("scr").style.display = "none";
-        let collectedMilk = document.getElementById("collectedMilk");
-        let colMilk = document.getElementById("colMilk");
-        let scaleReading;
-        let meth = document.getElementById("meth");
-
-        function selectMethod() {
-            let method = document.getElementById("method").value;
-            meth.value = method;
-
-            // console.log(meth.value);
-            if (method == "Stick Reading") {
-                document.getElementById("sr").style.display = "block";
-                document.getElementById("er").style.display = "block";
-                document.getElementById("ev").style.display = "none";
-                document.getElementById("scr").style.display = "none";
-                localStorage.clear();
-                collectedMilk.innerHTML = "";
-            } else if (method == "Scale At Farm") {
-                document.getElementById("sr").style.display = "none";
-                document.getElementById("er").style.display = "none";
-                document.getElementById("ev").style.display = "none";
-                document.getElementById("scr").style.display = "block";
-                localStorage.clear();
-                collectedMilk.innerHTML = "";
-            } else if (method == "Estimated Value") {
-                document.getElementById("sr").style.display = "none";
-                document.getElementById("er").style.display = "none";
-                document.getElementById("ev").style.display = "block";
-                document.getElementById("scr").style.display = "none";
-                localStorage.clear();
-                collectedMilk.innerHTML = "";
-            } else if (method == "Scale At Plant") {
-                document.getElementById("sr").style.display = "none";
-                document.getElementById("er").style.display = "none";
-                document.getElementById("ev").style.display = "none";
-                document.getElementById("scr").style.display = "none";
-                localStorage.setItem("scaleReadingAtPlant", "Yes");
-                collectedMilk.innerHTML = "You Will have to Enter The Reading At Plant";
-                colMilk.value = 0;
-                localStorage.setItem('milk', 0);
-            }
-        }
-
-        let tankType = document.getElementById("tankType").value;
-        let tankRadius;
-        let tankWidth, tankHeight, tankLength, volume;
-
-        if (tankType) {
-            if (tankType == "rectangular") {
-                tankWidth = document.getElementById("tankWidth").value;
-                tankHeight = document.getElementById("tankHeight").value;
-                tankLength = document.getElementById("tankLength").value;
-                // console.log(tankLength);
-
-            } else if (tankType == "cylindrical") {
-                tankHeight = document.getElementById("tankHeight").value;
-                tankRadius = document.getElementById("tankRadius").value;
-            }
-        }
-
-        function calculateStickReadings() {
-
-            let startReading = document.getElementById("startReading").value;
-            let endReading = document.getElementById("endReading").value;
-            tankHeight = parseFloat(document.getElementById("tankHeight").value);
-            if (startReading > tankHeight) {
-                alert("Start reading can't be greater than tank's height");
-                return;
-            }
-            if (startReading < endReading) {
-                alert("Please Enter The Valid Value");
-                return;
-            } else {
-                let height = startReading - endReading;
-
-                if (tankType == "rectangular") {
-                    // console.log(tankWidth);
-                    // console.log(tankLength);
-                    // console.log(height);
-                    volume = ((tankWidth * height * tankLength) * 7.48) * 8.6;
-                    collectedMilk.innerHTML = volume;
-                    colMilk.value = volume;
-                } else if (tankType == "cylindrical") {
-                    volume = ((3.14 * tankRadius * tankRadius * height) * 8.6) / 231;
-                    collectedMilk.innerHTML = volume;
-                    colMilk.value = volume;
-                    localStorage.setItem('milk', volume);
+            setInterval(async () => {
+                const barcodes = await barcodeDetector.detect(video);
+                if (barcodes.length > 0) {
+                    const value = barcodes[0].rawValue;
+                    result = value;
+                    console.log(result);
+                    document.getElementById("result").innerText = value;
                 }
-            }
-
-        }
-
-        function calaculateScaleReadings() {
-            scaleReading = document.getElementById("scaleReading").value;
-            collectedMilk.innerHTML = scaleReading;
-            colMilk.value = scaleReading;
-            localStorage.setItem('milk', scaleReading);
-        }
-
-        function calculateEstimatedValue() {
-            let estimatedValue = document.getElementById("estimatedReading").value;
-            collectedMilk.innerHTML = estimatedValue;
-            colMilk.value = estimatedValue;
-            localStorage.setItem('milk', estimatedValue);
-        }
-
+            }, 50);
         
+    });
+console.log("scanning");
+
+    
+
+    
+        // console.log(result.length);
+      
+        for(let i = 0; i< result.length ; i++){
+            if(i<4){
+                trackingID = trackingID + result[i];
+            }
+            else if(i<11){
+                farmID = farmID + result[i];
+            }
+            else if(i<18){
+                tankID = tankID + result[i];
+            }
+            else if(i<24){
+                patronID = patronID + result[i];
+            }
+        }
+        track.value = trackingID;
+        farm.value = farmID;
+        tank.value = tankID;
+        patron.value = patronID;
+        console.log(track.value);
+        console.log(tank.value);
+        console.log(farm.value);
+        console.log(patron.value);
+
+        $('#checkBtn').click(function(){
+            console.log('button clicked');
+            let trackingid = $('#tracking_id').val();
+            let farmid = $('#farm_id').val();
+            let tankid = $('#tank_id').val();
+            let patronid = $('#patron_id').val();
+
+            $.ajax({
+                url: '/check-data',
+                type: 'GET',
+                data: {
+                    trackingId : trackingid,
+                    farmId : farmid,
+                    tankId : tankid,
+                    patronId : patronid
+                },
+                success: function(response){
+                    console.log(response);
+                }
+            })
+        })
     </script>
 
-  <h2>📷 Scan Barcode (Code 128)</h2>
-  <div id="yourElement"></div>
-  <div id="result">Waiting for scan...</div>
-
-  <script>
-    Quagga.init({
-      inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: document.querySelector('#yourElement'),
-        constraints: {
-          facingMode: "environment" // Use back camera on mobile
-        }
-      },
-      locator: {
-        patchSize: "medium",
-        halfSample: true
-      },
-      numOfWorkers: navigator.hardwareConcurrency || 4,
-      decoder: {
-        readers: ["code_128_reader"]
-      },
-      locate: true
-    }, function (err) {
-      if (err) {
-        console.error("Quagga init error:", err);
-        return;
-      }
-      console.log("Quagga initialization finished.");
-      Quagga.start();
-    });
-
-    // Handle detected barcode
-    Quagga.onDetected((data) => {
-      const code = data.codeResult.code;
-      const resultDiv = document.getElementById("result");
-
-      // Show result if different from previous
-      if (resultDiv.innerText !== code) {
-        console.log("Barcode detected:", code);
-        resultDiv.innerText = "Scanned: " + code;
-
-        // Optional: stop after successful scan
-        Quagga.stop();
-
-        // Optional: Redirect or send to server
-        // window.location.href = "?id=" + code;
-      }
-    });
-  </script>
 
 </body>
 

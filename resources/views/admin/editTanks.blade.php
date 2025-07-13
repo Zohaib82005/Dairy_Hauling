@@ -25,7 +25,7 @@
             <div class="col-12">
                 <div class="form-floating">
                     <select name="farm_id" id="farm_id" class="form-control">
-                        <option value={{ $tank->id }} selected>{{$tank->tfname}} |{{ $tank->tankFarmId }}</option>
+                        <option value="{{ $tank->fid }}" selected>{{$tank->tfname}} |{{ $tank->tankFarmId }}</option>
                         @foreach ($farms as $farm)
                             <option value="{{ $farm->id }}">{{$farm->name}} | {{$farm->farm_id}}</option>
                         @endforeach
@@ -75,7 +75,7 @@
             </div>
             <div class="col-12">
                 <div class="form-floating text-center">
-                    <button type="submit" class=" btn btn-dark m-2 p-2 px-5" >Add Tank</button>
+                    <button type="submit" class=" btn btn-dark m-2 p-2 px-5" >Update Tank</button>
                 </div>
             </div>
         </div>

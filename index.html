@@ -1,59 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuaggaJS Barcode Scanner</title>
-  <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
-  <style>
-   
-  </style>
-</head>
-<body>
+<input type="file" id="barcodeInput" accept="image/*" />
+<img id="barcodeImage" style="display:none;">
+<p id="output"></p>
+    <script src="https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.20/dist/index.js"></script>
 
-  <h2>📷 Scan Barcode (Code 128)</h2>
-  <div id="yourElement"></div>
-  <div id="result">Waiting for scan...</div>
+<script>
+document.getElementById("barcodeInput").addEventListener("change", async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  <script>
-    Quagga.init({
-      inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: document.querySelector('#yourElement'),
-        constraints: {
-          facingMode: "environment" 
-        }
-      },
-      locator: {
-        patchSize: "medium",
-        halfSample: true
-      },
-      numOfWorkers: navigator.hardwareConcurrency || 4,
-      decoder: {
-        readers: ["code_128_reader"]
-      },
-      locate: true
-    }, function (err) {
-      if (err) {
-        console.error("Quagga init error:", err);
-        return;
-      }
-      console.log("Quagga initialization finished.");
-      Quagga.start();
-    });
-
+    const image = document.getElementById("barcodeImage");
+    image.src = URL.createObjectURL(file);
     
-    Quagga.onDetected((data) => {
-      const code = data.codeResult.code;
-      const resultDiv = document.getElementById("result");
+    image.onload = async () => {
+        
 
-      
-      if (resultDiv.innerText !== code) {
-        console.log("Barcode detected:", code);
-        resultDiv.innerText = "Scanned: " + code;
-      }
-    });
-  </script>
-</body>
-</html>
+        const detector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'qr_code', 'upc_a'] });
+
+        try {
+            const barcodes = await detector.detect(image);
+            if (barcodes.length > 0) {
+                document.getElementById("output").innerText = "📦 Barcode: " + barcodes[0].rawValue;
+            } else {
+                document.getElementById("output").innerText = "❌ No barcode found.";
+            }
+        } catch (err) {
+            console.error("Detection error:", err);
+        }
+    };
+});
+</script>

@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckUser;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 
 //admin routes
@@ -104,7 +105,7 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::post('/dashboard/update',[UserController::class,'completeProfile'])->name('user.update.profile');
     Route::post('/dashboard/startTicket',[UserController::class, 'storeTicket'])->name('storeTicket');
     Route::get('/dashboard/view/route/{id}',[UserController::class, 'viewRoutes'])->name('view.route');
-    Route::get('/routes/addfarmstops/{id}/ticket/{ticketID}',[UserController::class,'viewFarmStopDetails'])->name('view.farm.stop');
+    Route::get('/routes/addfarmstops/ticket/{ticketID}',[UserController::class,'viewFarmStopDetails'])->name('view.farm.stop');
 
     Route::get('/routes/addfarmstops/tank/{farmID}',[UserController::class, 'showTank'])->name('show.tank');
     Route::post('/route/addfarmStop',[UserController::class, 'addFarmStop'])->name('add.farm.stop');
@@ -116,5 +117,7 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::post('/collectmilk/atplant/{ticketID}',[UserController::class,'collectMilkAtPlant'])->name('collect.at.plant');
     Route::get('/routes/scaleat/plant/{ticketID}',[UserController::class, 'viewScaleAtPlant'])->name('view.scaleAtPlant');
     Route::get('/pdf',[UserController::class, 'sendPdf'])->name('sendPDF');
+
+    Route::get('/check-data',[UserController::class, 'checkData']);
 });
 

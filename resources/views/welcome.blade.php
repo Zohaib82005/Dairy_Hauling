@@ -79,7 +79,7 @@
                     <div class="dropdown-menu bg-light m-0">
                         <a href="{{ route('signup') }}" class="dropdown-item">SignUp</a>
                         <a href="{{ route('user.login') }}" class="dropdown-item">Login</a>
-                        <a href="feature.html" class="dropdown-item">Admin</a>
+                    
                        
                     </div>
                 </div>

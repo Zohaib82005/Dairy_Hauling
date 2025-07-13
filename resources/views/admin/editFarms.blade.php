@@ -62,7 +62,7 @@
                 
                 <div class="col-12">
                     <div class="form-floating text-center">
-                        <button type="submit" class=" btn btn-success m-2 p-2 px-5" >Add Farm</button>
+                        <button type="submit" class=" btn btn-success m-2 p-2 px-5" >Update Farm</button>
                     </div>
                 </div>
                 
