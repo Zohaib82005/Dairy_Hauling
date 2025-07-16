@@ -1,5 +1,5 @@
 @php
-    $data = DB::table('farm_stop_scans')->select('collected_milk')->where('user_id',$userId)->where('ticket_id', $ticketID)->where('created_at',now()->format('y-m-d'))->get();
+    $data = DB::table('farm_stop_scans')->select('collected_milk')->where('user_id',$userId)->where('ticket_id', $ticketID)->get();
     $totalMilk = 0;
     foreach ($data as $d) {
         $totalMilk = $totalMilk + $d->collected_milk;

@@ -107,10 +107,10 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::get('/dashboard/view/route/{id}',[UserController::class, 'viewRoutes'])->name('view.route');
     Route::get('/routes/addfarmstops/ticket/{ticketID}',[UserController::class,'viewFarmStopDetails'])->name('view.farm.stop');
 
-    Route::get('/routes/addfarmstops/tank/{farmID}',[UserController::class, 'showTank'])->name('show.tank');
     Route::post('/route/addfarmStop',[UserController::class, 'addFarmStop'])->name('add.farm.stop');
+    Route::get('/routes/addfarmstops/tank/{farmID}',[UserController::class, 'showTank'])->name('show.tank');
 
-    Route::get('/routes/destinationplant/{routeID}/{ticketID}',[UserController::class, 'destinationPlant'])->name('destinationPlant');
+    Route::get('/routes/destinationplant/{ticketID}',[UserController::class, 'destinationPlant'])->name('destinationPlant');
 
 
     Route::get('/routes/closeroutes/{ticketID}',[UserController::class, 'closeRoute'])->name('close.route');
@@ -119,5 +119,10 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::get('/pdf',[UserController::class, 'sendPdf'])->name('sendPDF');
 
     Route::get('/check-data',[UserController::class, 'checkData']);
+    Route::get('/getLocation',function (Request $request){
+        session()->put('lat1', $request->latitude);
+        session()->put('long1',$request->longitude);
+        return response()->json(['status'=>"Success"]);
+    });
 });
 

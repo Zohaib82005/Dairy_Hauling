@@ -30,7 +30,7 @@
     <!-- Template Stylesheet -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <style>
-        .rounded{
+        .rounded {
             border: 3px solid green !important;
         }
     </style>
@@ -73,27 +73,137 @@
             {{-- <p>Here are the details how you will go and collect milk from different Farms</p> --}}
         </div>
         <div class="container m-2 p-2 border rounded">
-              <h5 class="my-2">Ticket Number: {{$tickets->ticket_number}}</h5>
+            <h5 class="my-2">Ticket Number: {{ $tickets->ticket_number }}</h5>
             <div class="row mb-2">
                 <div class="col-lg-6">
-                    <h6 class="my-4">Pickup Date: {{$tickets->pickup_date}}</h6>
-                    <h6 class="my-4">Route Number: {{$tickets->route_number}}</h6>
-                    <h6 class="my-4">Hauler:{{ $tickets->hname}}</h6>
+                    <h6 class="my-4">Pickup Date: {{ $tickets->pickup_date }}</h6>
+                    <h6 class="my-4">Route Number: {{ $tickets->route_number }}</h6>
+                    <h6 class="my-4">Hauler:{{ $tickets->hname }}</h6>
                 </div>
                 <div class="col-lg-6">
-                    <h6 class="my-4">Truck ID: {{$tickets->truckID}}</h6>
-                    <h6 class="my-4">Trailer ID: {{$tickets->trailerID}}</h6>
-                    <h6 class="my-4">Status: {{$tickets->status }}</h6>
+                    <h6 class="my-4">Truck ID: {{ $tickets->truckID }}</h6>
+                    <h6 class="my-4">Trailer ID: {{ $tickets->trailerID }}</h6>
+                    <h6 class="my-4">Status: {{ $tickets->status }}</h6>
                 </div>
             </div>
-            <a href="{{ route('view.farm.stop',$ticketID) }}" class="btn btn-success"><i class="fas fa-plus me-2"></i>Add Farm Stop</a>
-            <a href="#" onclick="closeLoad()" class="btn btn-success"><i class="fas fa-stop me-2"></i>Close Load</a>
-            <a href="" class="btn btn-success"><i class="fas fa-truck me-2"></i>Complete Delivery</a>
+            <div class="container">
+                <div class="my-2">
+                <h5 class="bg-success text-white d-inline p-2 rounded"><i class="bi bi-sign-stop-fill"></i> Next Stop</h5>
+                </div>
+                <script>
+                    let lcate, lat, lon;
+                </script>
+                @foreach ($farmsInRoute as $fir)
+                    <span class="bg-warning p-1"><strong class="text-dark">Farm Name: </strong>{{$fir->name}}</span>
+                    <div class="container bg-dark my-2 p-2 rounded">
+                        <h5 class="text-white"><i class="bi bi-geo-alt"></i> Location: </h5>
+                        <p id="lcate" class="text-white">Loading...</p>
+                    </div>
+                    <script>
+                        lcate = document.getElementById("lcate");
+                        lat = "{{ $fir->latitude }}";
+                        lon = "{{ $fir->longitude }}";
+
+
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            lcate.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
+                            // console.log(data.display_name);
+                        })
+                        .catch(err => {
+                            lcate.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
+                            lcate.classList.remove('bg-dark');
+                            lcate.parentElement.classList.add('bg-danger');
+                        });
+                    </script>
+                @endforeach
+            </div>
+            <a href="{{ route('view.farm.stop', $ticketID) }}" class="btn btn-success my-2"><i
+                    class="fas fa-plus me-2"></i>Add Farm Stop</a>
+            <a href="{{ route('destinationPlant',$ticketID) }}" onclick="closeLoad()" class="btn btn-success my-2"><i class="fas fa-stop me-2"></i>Close
+                Load</a>
+                
+            {{-- <a href="" class="btn btn-success my-2"><i class="fas fa-truck me-2"></i>Complete Delivery</a> --}}
         </div>
-   
-                {{-- ------------------------------- --}}
+
+        {{-- ------------------------------- --}}
     </div>
 
+    <div class="container">
+        <table class="table table-striped text-center" style="border: 2px solid green; border-radius: 3px;">
+            <thead>
+                <th>Farm Name</th>
+                <th>Tank</th>
+                <th>Collection Date</th>
+                <th>Collected Milk</th>
+            </thead>
+            <tbody>
+                @php
+                    $totalMilk = 0;
+                @endphp
+                @foreach ($collectedFarms as $cf)
+                    @php
+                        $totalMilk = $totalMilk + $cf->collected_milk;
+                    @endphp
+                    <tr>
+                        <td>{{ $cf->fname }}</td>
+                        <td>{{ $cf->tankId }}</td>
+                        <td>{{ $cf->farmCollectedAt }}</td>
+                        <td>{{ $cf->collected_milk }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <span><strong>Total Milk Colleted: </strong>{{ $totalMilk }}</span>
+
+@php
+$desPlant = DB::table('routes')
+    ->join('plants', 'routes.destination_plant', '=', 'plants.id')
+    ->select('latitude', 'longitude')
+    ->where('route_number', $tickets->route_number)
+    ->first();
+// dd($destinationPlant);
+$lat2 = $desPlant->latitude;
+$long2 = $desPlant->longitude;
+$lat1 = session('lat1');
+$long1 = session('long1');
+function distanceBtw($lat1, $lon1, $lat2, $lon2)
+{
+                $R = 6371; // Earth's radius in km
+
+    $lat1 = deg2rad($lat1);
+    $lon1 = deg2rad($lon1);
+    $lat2 = deg2rad($lat2);
+    $lon2 = deg2rad($lon2);
+
+    $dlat = $lat2 - $lat1;
+    $dlon = $lon2 - $lon1;
+
+    $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlon / 2) * sin($dlon / 2);
+
+    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+    return $R * $c;
+}
+
+$speed = 70;
+$distance = distanceBtw($lat1, $long1, $lat2, $long2); // km
+session()->put('distance',$distance);
+$timeInHours = $distance / $speed;
+$totalSeconds = $timeInHours * 3600;
+
+$hours = floor($totalSeconds / 3600);
+$minutes = floor(($totalSeconds % 3600) / 60);
+$seconds = floor($totalSeconds % 60);
+
+$formattedTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
+session()->put('arrivalTime', $formattedTime);
+
+        @endphp
+    </div>
+{{-- <p>Estimated Arrival Time:{{ session('arrivalTime') }}</p> --}}
     <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
@@ -104,10 +214,14 @@
                     <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+92 303 7249933</p>
                     <p class="mb-2"><i class="fa fa-envelope me-3"></i>milk.hauling@company.com</p>
                     <div class="d-flex pt-3">
-                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i class="fab fa-youtube"></i></a>
-                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
+                                class="fab fa-youtube"></i></a>
+                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -131,8 +245,10 @@
                     <h5 class="text-white mb-4">Newsletter</h5>
                     <p>Subscribe to our news letter to get updates.</p>
                     <div class="position-relative w-100">
-                        <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
-                        <button type="button" class="btn btn-secondary py-2 position-absolute top-0 end-0 mt-2 me-2">Join Now</button>
+                        <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text"
+                            placeholder="Your email">
+                        <button type="button"
+                            class="btn btn-secondary py-2 position-absolute top-0 end-0 mt-2 me-2">Join Now</button>
                     </div>
                 </div>
             </div>
@@ -163,35 +279,41 @@
 
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-        const x = document.getElementById("userLocation");
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            x.innerHTML = "Geolocation is not supported by this browser.";
-        }
-
-
-
-        function showPosition(position) {
-            x.innerHTML = "Latitude: " + position.coords.latitude +
-                "<br>Longitude: " + position.coords.longitude;
-
-        }
+       
 
 
 
         function closeLoad() {
-            alert("Your milk collection will be completed and you will enter at your destination plant and email will be send to plant with your estimated arrival time");
+            alert(
+                "Your milk collection will be completed and you will enter at your destination plant and email will be send to plant with your estimated arrival time"
+                );
         }
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            $.ajax({
+                url: '/getLocation',
+                type: 'GET',
+                data: {
+                    latitude: lat,
+                    longitude: long
+                },
+                success: function(response){
+                    console.log(response);
+                }
+            }
+            );
+        });
     </script>
 
 
