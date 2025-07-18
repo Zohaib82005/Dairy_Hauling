@@ -189,34 +189,41 @@ class UserController extends Controller
     }
 
     public function storeTicket(Request $request)
-    {
-        $data = $request->validate([
-            'route_numb' => 'required',
-            'ticket_number' => 'required|unique:tickets,ticket_number',
-            'truckId' => 'required',
-            'trailerId' => 'required',
-            'pickupDate' => 'required',
-            'signature' => 'required|file|mimes:jpeg,png,jpg,webp,pdf'
-        ]);
+{
+    $data = $request->validate([
+        'route_numb' => 'required',
+        'ticket_number' => 'required|unique:tickets,ticket_number',
+        'truckId' => 'required',
+        'trailerId' => 'required',
+        'pickupDate' => 'required',
+        'signature' => 'required'
+    ]);
 
-        //    dd($data['signature']);
+ 
+    $image = $request->input('signature'); 
+    $image = str_replace('data:image/png;base64,', '', $image);
+    $image = str_replace(' ', '+', $image);
+    $imageData = base64_decode($image);
 
-        $signatures = $data['signature']->store('signatures', 'public');
-        // dd($data);
-        Ticket::create([
-            'route_id' => $data['route_numb'],
-            'ticket_number' => $data['ticket_number'],
-            'truck_id' => $data['truckId'],
-            'trailer_id' => $data['trailerId'],
-            'pickup_date' => $data['pickupDate'],
-            'signature' => $signatures,
-            'user_id' => Auth::user()->id
-        ]);
+   
+    $fileName = 'signature_' . time() . '.png';
+    $filePath = 'signatures/' . $fileName;
+// dd($filePath);
+   $store =  Storage::disk('public')->put($filePath, $imageData);
+// dd($store);
+    // Create the ticket record
+    Ticket::create([
+        'route_id' => $data['route_numb'],
+        'ticket_number' => $data['ticket_number'],
+        'truck_id' => $data['truckId'],
+        'trailer_id' => $data['trailerId'],
+        'pickup_date' => $data['pickupDate'],
+        'signature' => $filePath, // Save path in DB
+        'user_id' => Auth::id()
+    ]);
 
-        return redirect('/dashboard');
-
-        //    dd($a);
-    }
+    return redirect('/dashboard')->with('success', 'Ticket created successfully.');
+}
 
     public function viewRoutes($ticketID)
     {
@@ -228,10 +235,14 @@ class UserController extends Controller
         $collectedMilkTanks = Farm_stop_scan::select('tank_id')->where('user_id', Auth::user()->id)->where('ticket_id', $ticketID)->get();
         
         $routeID = Ticket::select('route_id')->where('id',$ticketID)->first();
-
+$ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
+            ->pluck('farm_id')
+            ->toArray();
         $farmsInRoute = Farm::select('name','latitude','longitude')
                         ->where('route_id',$routeID->route_id)
+                        ->whereNotIn('farm_id',$ticketFarm)
                         ->orderBy('latitude','asc')
+                        
                         ->get();
         
         // dd($routeID);
@@ -365,10 +376,14 @@ class UserController extends Controller
 
     public function collectMilkAtPlant(Request $request, $ticketID)
     {
+        $method = Farm_stop_scan::select('method')->where('ticket_id',$ticketID)->first();
         $request->validate([
+            'method' => 'required',
             'temprature' => 'required',
-            'collected_milk'
+            'collected_milk' => 'required_if:method,"Scale At Plant"'
         ]);
+
+        // dd($request);
         // $farms = Farm_stop_scan::join('farms','farms.id','=','farm_stop_scans.farm_id')
         //         ->join('tanks','tanks.id','=','farm_stop_scans.tank_id')
         //         ->select('farms.name as fname','tanks.tank_id as tankID')
@@ -420,7 +435,7 @@ class UserController extends Controller
             'ticketID' => $ticketID,
             'userId' => Auth::user()->id
         ];
-        // Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
+        Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
     public function sendPdf()

@@ -100,6 +100,7 @@
                         <p id="lcate" class="text-white">Loading...</p>
                     </div>
                     <script>
+                        
                         lcate = document.getElementById("lcate");
                         lat = "{{ $fir->latitude }}";
                         lon = "{{ $fir->longitude }}";
@@ -287,6 +288,7 @@ session()->put('arrivalTime', $formattedTime);
 
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
+    <img src="" alt="" id="mapholder">
     <script>
        
 
@@ -314,6 +316,17 @@ session()->put('arrivalTime', $formattedTime);
             }
             );
         });
+
+        // https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap
+
+        function showPosition(position) {
+  let latlon = position.coords.latitude + "," + position.coords.longitude;
+
+  let img_url = `https://maps.googleapis.com/maps/api/staticmap?center=
+  "+latlon+"&zoom=14&size=400x300&sensor=false&key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao`;
+
+  document.getElementById("mapholder").innerHTML = "<img src='"+img_url+"'>";
+}
     </script>
 
 

@@ -124,7 +124,7 @@
                     <td>{{$ticket->hname}}</td>
                     <td>{{$ticket->route_number}}</td>
                     <td>{{$ticket->status}}</td>
-                    <td><a href="{{ route('view.route',$ticket->tkid) }}" class="btn btn-success">View</a></td>
+                    <td><a href="{{ route('view.route',$ticket->tkid) }}" class="btn btn-success">Start Now</a></td>
                 </tr>
                 @endforeach
             </tbody>
@@ -227,6 +227,7 @@
                 alert("Please Complete Your Profile To Continue");
             }
         }
+
         
     </script>
 </body>

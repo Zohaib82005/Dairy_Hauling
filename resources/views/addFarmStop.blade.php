@@ -406,7 +406,9 @@
                 document.getElementById("scr").style.display = "none";
                 localStorage.clear();
                 collectedMilk.innerHTML = "";
+                
             } else if (method == "Scale At Plant") {
+                console.log(method);
                 document.getElementById("sr").style.display = "none";
                 document.getElementById("er").style.display = "none";
                 document.getElementById("ev").style.display = "none";
@@ -414,6 +416,7 @@
                 localStorage.setItem("scaleReadingAtPlant", "Yes");
                 collectedMilk.innerHTML = "You Will have to Enter The Reading At Plant";
                 colMilk.value = 0;
+                console.log(localStorage.getItem("scaleReadingAtPlant"));
                 localStorage.setItem('milk', 0);
             }
         }

@@ -112,17 +112,21 @@
 
                 @if ($errors->any())
                     <div class="alert alert-danger">
-                        <h5 class="mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Validation Errors:</h5>
+                        
                         <ul class="mb-0 ps-3">
                             @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
+                                <p><i class="bi bi-exclamation-triangle-fill me-2"></i> {{$error}}</p>
                             @endforeach
                         </ul>
                     </div>
                 @endif
 
-                <form action="{{ route('collect.at.plant', $ticketID) }}" method="POST" onsubmit="clearStorage()">
+                <form action="{{ route('collect.at.plant', $ticketID) }}" method="POST" l>
                     @csrf
+                    @php
+                        $method = DB::table('farm_stop_scans')->select('method')->where('ticket_id',$ticketID)->first();
+                    @endphp
+                    <input type="hidden" name="method" value="{{ $method->method }}">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="form-floating">
@@ -164,7 +168,7 @@
                                 class="fab fa-twitter"></i></a>
                         <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
                                 class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
+                                <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
                                 class="fab fa-youtube"></i></a>
                         <a class="btn btn-square btn-secondary rounded-circle me-2" href=""><i
                                 class="fab fa-linkedin-in"></i></a>
@@ -232,7 +236,9 @@
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-        let plantReading = localStorage.getItem("scaleReadingAtPlant");
+        let plantReading = "0";
+         plantReading = localStorage.getItem("scaleReadingAtPlant");
+        console.log(plantReading);
         let tankReading = document.getElementById("tankReading");
         tankReading.style.display = "none";
         if (plantReading == "Yes") {
@@ -243,15 +249,12 @@
             
         }
         
-        function clearStorage() {
-            inputField.removeAttribute("required");
-            localStorage.clear();
-        }
+        
 
         let locat = document.getElementById("location");
         let lat = "{{ $destinationPlant->latitude }}";
         let lon = "{{ $destinationPlant->longitude }}";
-        console.log(lat);
+        // console.log(lat);
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
             .then(response => response.json())
             .then(data => {

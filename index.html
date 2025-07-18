@@ -1,31 +1,53 @@
-<input type="file" id="barcodeInput" accept="image/*" />
-<img id="barcodeImage" style="display:none;">
-<p id="output"></p>
-    <script src="https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.20/dist/index.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas to Image Example</title>
+    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js'></script>
 
-<script>
-document.getElementById("barcodeInput").addEventListener("change", async function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const image = document.getElementById("barcodeImage");
-    image.src = URL.createObjectURL(file);
-    
-    image.onload = async () => {
-        
-
-        const detector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'qr_code', 'upc_a'] });
-
-        try {
-            const barcodes = await detector.detect(image);
-            if (barcodes.length > 0) {
-                document.getElementById("output").innerText = "📦 Barcode: " + barcodes[0].rawValue;
-            } else {
-                document.getElementById("output").innerText = "❌ No barcode found.";
-            }
-        } catch (err) {
-            console.error("Detection error:", err);
+    <style>
+        #sheet {
+            border: 1px solid black;
         }
-    };
-});
-</script>
+    </style>
+</head>
+<body>
+        <canvas id="myCanvas" width="800" height="600" style="border:1px solid #000;"></canvas>
+        <button onclick="convert()">convert</button>
+    <script>
+        
+                const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+                let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+                    canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY]; 
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return; // Stop if not drawing
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY); // Start from previous point
+                ctx.lineTo(e.offsetX, e.offsetY); // Draw to current point
+                ctx.stroke();
+                [lastX, lastY] = [e.offsetX, e.offsetY]; // Update last point
+            });
+
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mouseout', () => isDrawing = false);
+
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'black';
+function convert(){
+const img = canvas.toDataURL('image/png');
+    let url = img + ".png";
+        console.log(url);
+}
+        
+    </script>
+</body>
+</html>
