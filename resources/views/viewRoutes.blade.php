@@ -297,7 +297,7 @@ session()->put('arrivalTime', $formattedTime);
         function closeLoad() {
             alert(
                 "Your milk collection will be completed and you will enter at your destination plant and email will be send to plant with your estimated arrival time"
-                );
+            );
         }
 
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -317,7 +317,6 @@ session()->put('arrivalTime', $formattedTime);
             );
         });
 
-        // https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap
 
   
     </script>
