@@ -125,8 +125,9 @@
                     @csrf
                     @php
                         $method = DB::table('farm_stop_scans')->select('method')->where('ticket_id',$ticketID)->first();
+                        // dd($method);
                     @endphp
-                    <input type="hidden" name="method" value="{{ $method->method }}">
+                        @if($method != null)
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="form-floating">
@@ -135,15 +136,18 @@
                                 <label for="temprature">Milk Temperature (°F)</label>
                             </div>
                         </div>
-
+                        @if ($method->method == "Scale At Plant")
+                            
                         <div class="col-md-6" id="tankReading">
                             <div class="form-floating">
-                                <input type="number" name="collected_milk" id="cm" class="form-control"
-                                     placeholder="Collected Milk">
+                                <input type="number" name="collected_milk" required id="cm" class="form-control"
+                                placeholder="Collected Milk">
                                 <label for="cm">Milk Reading at Plant (lbs)</label>
                             </div>
                         </div>
-
+                        
+                        @endif
+                        @endif
                         <div class="col-12 text-center">
                             <button type="submit" class="btn btn-lg btn-success mt-3 px-5">
                                 <i class="bi bi-check-circle-fill me-2"></i>Close Route
@@ -236,18 +240,7 @@
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-        let plantReading = "0";
-         plantReading = localStorage.getItem("scaleReadingAtPlant");
-        console.log(plantReading);
-        let tankReading = document.getElementById("tankReading");
-        tankReading.style.display = "none";
-        if (plantReading == "Yes") {
-            tankReading.style.display = "block";
-
-            let inputField = document.getElementById("cm");
-            inputField.setAttribute("required");
-            
-        }
+       
         
         
 

@@ -21,11 +21,31 @@
     <form action="{{ route('admin.add.hauler') }}" method="POST" class="m-5 p-5 border shadow-lg">
         @csrf
         <div class="row">
+            
 
             <div class="col-12">
                 <div class="form-floating">
-                    <input type="text" name="name" class="form-control my-2" id="FullName" placeholder="Your Full Name">
+                    <input type="text" name="name" class="form-control my-2" id="FullName" required placeholder="Your Full Name">
                     <label for="FullName">Full Name</label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="text" name="username" class="form-control my-2" id="FullName" required placeholder="Username">
+                    <label for="FullName">Username</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="email" name="email" class="form-control my-2" id="FullName" required placeholder="Your Full Email">
+                    <label for="FullName">Email</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="password" name="password" class="form-control my-2" id="FullName" placeholder="Your Password">
+                    <label for="FullName">Password</label>
                 </div>
             </div>
             <div class="col-12">
@@ -41,7 +61,7 @@
                     <label for="shipNumber">2 Digit Shipp Number</label>
                 </div>
             </div>
-
+            
             <div class="col-12">
                 <div class="form-floating text-center">
                     <button type="submit" class=" btn btn-warning m-2 p-2 px-5" >Add Hauler</button>

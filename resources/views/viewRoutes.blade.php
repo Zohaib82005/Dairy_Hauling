@@ -42,6 +42,7 @@
     <div id="spinner"
         class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        Loading...
     </div>
     <!-- Spinner End -->
 
@@ -88,50 +89,52 @@
             </div>
             <div class="container">
                 <div class="my-2">
-                <h5 class="bg-success text-white d-inline p-2 rounded"><i class="bi bi-sign-stop-fill"></i> Next Stop</h5>
+                    <h5 class="bg-success text-white d-inline p-2 rounded"><i class="bi bi-sign-stop-fill"></i> Next
+                        Stop</h5>
                 </div>
                 <script>
                     let lcate, lat, lon;
                 </script>
                 @foreach ($farmsInRoute as $fir)
-                    <span class="bg-warning p-1"><strong class="text-dark">Farm Name: </strong>{{$fir->name}}</span>
+                    <span class="bg-warning p-1"><strong class="text-dark">Farm Name:
+                        </strong>{{ $fir->name }}</span>
                     <div class="container bg-dark my-2 p-2 rounded">
                         <h5 class="text-white"><i class="bi bi-geo-alt"></i> Location: </h5>
                         <p id="lcate" class="text-white">Loading...</p>
                     </div>
                     <script>
-                        
                         lcate = document.getElementById("lcate");
                         lat = "{{ $fir->latitude }}";
                         lon = "{{ $fir->longitude }}";
 
 
                         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            lcate.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
-                            // console.log(data.display_name);
-                        })
-                        .catch(err => {
-                            lcate.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
-                            lcate.classList.remove('bg-dark');
-                            lcate.parentElement.classList.add('bg-danger');
-                        });
+                            .then(response => response.json())
+                            .then(data => {
+                                lcate.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
+                                // console.log(data.display_name);
+                            })
+                            .catch(err => {
+                                lcate.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
+                                lcate.classList.remove('bg-dark');
+                                lcate.parentElement.classList.add('bg-danger');
+                            });
                     </script>
                 @endforeach
             </div>
             <a href="{{ route('view.farm.stop', $ticketID) }}" class="btn btn-success my-2"><i
                     class="fas fa-plus me-2"></i>Add Farm Stop</a>
-            <a href="{{ route('destinationPlant',$ticketID) }}" onclick="closeLoad()" class="btn btn-success my-2"><i class="fas fa-stop me-2"></i>Close
+            <a href="{{ route('destinationPlant', $ticketID) }}" onclick="closeLoad()" class="btn btn-success my-2"><i
+                    class="fas fa-stop me-2"></i>Close
                 Load</a>
-                
+
             {{-- <a href="" class="btn btn-success my-2"><i class="fas fa-truck me-2"></i>Complete Delivery</a> --}}
         </div>
 
         {{-- ------------------------------- --}}
     </div>
 
-    <div class="container">
+    <div class="container rounded border">
         <table class="table table-striped text-center" style="border: 2px solid green; border-radius: 3px;">
             <thead>
                 <th>Farm Name</th>
@@ -142,11 +145,20 @@
             <tbody>
                 @php
                     $totalMilk = 0;
+                    $plantMilk = 0;
+                    // dd($collectedFarms);
                 @endphp
                 @foreach ($collectedFarms as $cf)
                     @php
-                        $totalMilk = $totalMilk + $cf->collected_milk;
+                    
+                        if($cf->method == "Scale At Plant"){
+                            $plantMilk = $cf->collected_milk;
+                        }else{
+                            $totalMilk = $totalMilk + $cf->collected_milk;
+                        }
+
                     @endphp
+
                     <tr>
                         <td>{{ $cf->fname }}</td>
                         <td>{{ $cf->tankId }}</td>
@@ -154,24 +166,28 @@
                         <td>{{ $cf->collected_milk }}</td>
                     </tr>
                 @endforeach
+
+                @php
+                    $totalMilk = $totalMilk + $plantMilk;
+                @endphp
             </tbody>
         </table>
 
-        <span><strong>Total Milk Colleted: </strong>{{ $totalMilk }}</span>
+        <span><strong>Total Milk Colleted: </strong>{{ $totalMilk }} lbs</span>
 
-@php
-$desPlant = DB::table('routes')
-    ->join('plants', 'routes.destination_plant', '=', 'plants.id')
-    ->select('latitude', 'longitude')
-    ->where('route_number', $tickets->route_number)
-    ->first();
-// dd($destinationPlant);
-$lat2 = $desPlant->latitude;
-$long2 = $desPlant->longitude;
-$lat1 = session('lat1');
-$long1 = session('long1');
-function distanceBtw($lat1, $lon1, $lat2, $lon2)
-{
+        @php
+            $desPlant = DB::table('routes')
+                ->join('plants', 'routes.destination_plant', '=', 'plants.id')
+                ->select('latitude', 'longitude')
+                ->where('route_number', $tickets->route_number)
+                ->first();
+            // dd($destinationPlant);
+            $lat2 = $desPlant->latitude;
+            $long2 = $desPlant->longitude;
+            $lat1 = session('lat1');
+            $long1 = session('long1');
+            function distanceBtw($lat1, $lon1, $lat2, $lon2)
+            {
                 $R = 6371; // Earth's radius in km
 
     $lat1 = deg2rad($lat1);
@@ -190,7 +206,7 @@ function distanceBtw($lat1, $lon1, $lat2, $lon2)
 
 $speed = 70;
 $distance = distanceBtw($lat1, $long1, $lat2, $long2); // km
-session()->put('distance',$distance);
+session()->put('distance', $distance);
 $timeInHours = $distance / $speed;
 $totalSeconds = $timeInHours * 3600;
 
@@ -204,7 +220,7 @@ session()->put('arrivalTime', $formattedTime);
 
         @endphp
     </div>
-{{-- <p>Estimated Arrival Time:{{ session('arrivalTime') }}</p> --}}
+    {{-- <p>Estimated Arrival Time:{{ session('arrivalTime') }}</p> --}}
     <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
@@ -290,17 +306,13 @@ session()->put('arrivalTime', $formattedTime);
     <script src="{{ asset('js/main.js') }}"></script>
     <img src="" alt="" id="mapholder">
     <script>
-       
-
-
-
         function closeLoad() {
             alert(
                 "Your milk collection will be completed and you will enter at your destination plant and email will be send to plant with your estimated arrival time"
             );
         }
-
-        navigator.geolocation.getCurrentPosition(function(position) {
+setInterval(() => {
+    navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const long = position.coords.longitude;
             $.ajax({
@@ -310,15 +322,13 @@ session()->put('arrivalTime', $formattedTime);
                     latitude: lat,
                     longitude: long
                 },
-                success: function(response){
+                success: function(response) {
                     console.log(response);
                 }
-            }
-            );
+            });
         });
-
-
-  
+}, 5000);
+        
     </script>
 
 

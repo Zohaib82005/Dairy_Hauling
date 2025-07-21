@@ -134,10 +134,11 @@
                     </div>
 
                     <div class="col-12 my-2">
-                        <label for="signature">Upload Signatures</label>
-                        <canvas id="myCanvas" width="200" height="200" style="border:1px solid #000;"></canvas>
+                        <h5>Do Your Signature Here: </h5>
+                        <canvas id="myCanvas" height="200" style="border:1px solid #000;"></canvas>
                         <button id="uploadSignature" type="button" class="btn btn-danger" onclick="convert()">Upload
                             Signature</button>
+                        <button class="btn btn-primary" type="button" onclick="clearSignature()">Clear Signature</button>
                         <input type="hidden" value="" name="signature" id="sign">
                     </div>
 
@@ -234,39 +235,66 @@
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-        const canvas = document.getElementById('myCanvas');
-        const ctx = canvas.getContext('2d');
-        let sign = document.getElementById('sign');
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+let sign = document.getElementById('sign');
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
 
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        });
+ctx.lineWidth = 5;
+ctx.lineCap = 'round';
+ctx.strokeStyle = 'black';
 
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return; // Stop if not drawing
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY); // Start from previous point
-            ctx.lineTo(e.offsetX, e.offsetY); // Draw to current point
-            ctx.stroke();
-            [lastX, lastY] = [e.offsetX, e.offsetY]; // Update last point
-        });
+canvas.addEventListener('mousedown', (e) => startDraw(e.offsetX, e.offsetY));
+canvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
+canvas.addEventListener('mouseup', stopDraw);
+canvas.addEventListener('mouseout', stopDraw);
 
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mouseout', () => isDrawing = false);
+canvas.addEventListener('touchstart', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    startDraw(touch.clientX - rect.left, touch.clientY - rect.top);
+    e.preventDefault();
+});
 
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = 'black';
+canvas.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    draw(touch.clientX - rect.left, touch.clientY - rect.top);
+    e.preventDefault();
+});
 
-        function convert() {
-            const img = canvas.toDataURL('image/png');
-            sign.value = img;
-        }
-    </script>
+canvas.addEventListener('touchend', stopDraw);
+
+function startDraw(x, y) {
+    isDrawing = true;
+    [lastX, lastY] = [x, y];
+}
+
+function draw(x, y) {
+    if (!isDrawing) return;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+}
+
+function stopDraw() {
+    isDrawing = false;
+}
+
+function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function convert() {
+    const img = canvas.toDataURL('image/png');
+    sign.value = img;
+    alert('Signature saved!');
+}
+</script>
 
 </body>
 

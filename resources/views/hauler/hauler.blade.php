@@ -21,10 +21,6 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </button>
 
-            <button class="nav-link" data-tab="haulers">
-                <i class="fas fa-building"></i> Haulers
-            </button>
-            
             <button class="nav-link" data-tab="driver">
                 <i class="fa-solid fa-user"></i> Drivers
             </button>
@@ -38,14 +34,7 @@
             <button class="nav-link" data-tab="trailers">
                 <i class="fas fa-trailer"></i> Trailers
             </button>
-
-            <button class="nav-link" data-tab="plants">
-                <i class="fas fa-place-of-worship"></i> Plants
-            </button>
-
-             <button class="nav-link" data-tab="routes">
-                <i class="fa-solid fa-road"></i> Routes
-            </button>
+            
 
             <button class="nav-link" data-tab="farms">
                 <i class="fas fa-house-chimney-window"></i> Farms
@@ -189,7 +178,7 @@
 
             <!-- Driver Tab Content -->
             <div class="tab-content" id="driver">
-                <a href="{{ route('addDriver') }}" class="btn btn-danger">Add Driver</a>
+                <a href="{{ route('hauler.addDriver') }}" class="btn btn-danger">Add Driver</a>
                 <div class="row">
                     @foreach ($users as $user)
 
@@ -210,46 +199,16 @@
                                 <p><b>Hauler:</b> {{ $user->haulerName }}</p>
                             </div>
                         </div>
-                        <a href="{{ route('admin.editDriver',$user->uid) }}" class="btn btn-primary mx-2">Edit</a><a href="{{ route('admin.deleteDriver',$user->uid) }}" class="btn btn-danger">Delete</a>
+                        <a href="{{ route('hauler.editDriver',$user->uid) }}" class="btn btn-primary mx-2">Edit</a><a href="{{ route('hauler.deleteDriver',$user->uid) }}" class="btn btn-danger">Delete</a>
                     </div>
                     @endforeach
                 </div>
             </div>
 
-            <!-- haulers Tab Content -->
-            <div class="tab-content" id="haulers">
-                <a href="{{ route('admin.addHauler') }}" class="btn btn-warning">Add Hauler</a>
-                <div class="row">
-                    <div class="col-12">
-                        <table class="table table-striped" border>
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Address</th>
-                                    <th>Email</th>
-                                    <th>Shipp Number</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($haulers as $hauler)
-                                <tr>
-                                    <td>{{ $hauler->name }}</td>
-                                    <td>{{ $hauler->address }}</td>
-                                    <td>{{$hauler->email}}</td>
-                                    <td>{{$hauler->shipp_number}}</td>
-                                    <td><a href="{{ route('admin.editHauler', $hauler->id) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.deleteHauler',$hauler->id) }}" class="btn btn-danger">Delete</a> <a href="{{ route('hauler.adminSide.login',$hauler->id) }}" class="btn btn-success" >Login</a></td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
+            
             <!-- Trucks Tab Content -->
             <div class="tab-content" id="Trucks">
-                <a href="{{ route('admin.add.trucks') }}" class="btn btn-primary my-2">Add Trucks</a>
+                <a href="{{ route('hauler.add.trucks') }}" class="btn btn-primary my-2">Add Trucks</a>
                 <div class="row">
                     <div class="col-12">
 
@@ -268,7 +227,7 @@
                                     <td>{{ $truck->hauler_name }}</td>
                                     <td>{{ $truck->hauler_number }}</td>
                                     <td>{{$truck->truck_id}}</td>
-                                    <td><a href="{{ route('admin.editTruck', $truck->tid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.deleteTruck',$truck->tid) }}" class="btn btn-danger">Delete</a></td>
+                                    <td><a href="{{ route('hauler.editTruck', $truck->tid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('hauler.deleteTruck',$truck->tid) }}" class="btn btn-danger">Delete</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -278,7 +237,7 @@
             </div>
 {{-- Trailers tab content --}}
 <div class="tab-content" id="trailers">
-    <a href="{{ route('admin.add.trailer') }}" class="btn btn-warning my-2">Add Trailer</a>
+    <a href="{{ route('hauler.add.trailer') }}" class="btn btn-warning my-2">Add Trailer</a>
                 <div class="row">
 
                     <div class="col-12">
@@ -299,7 +258,7 @@
                                     <td>{{ $trailer->shippNumber }}</td>
                                     <td>{{$trailer->trailer_id}}</td>
                                     <td>{{$trailer->capacity}}</td>
-                                    <td><a href="{{ route('admin.edit.Trailer', $trailer->trid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.delete.trailer',$trailer->trid) }}" class="btn btn-danger">Delete</a></td>
+                                    <td><a href="{{ route('hauler.edit.Trailer', $trailer->trid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('hauler.delete.trailer',$trailer->trid) }}" class="btn btn-danger">Delete</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -307,39 +266,8 @@
                     </div>
                 </div>
             </div>
-{{-- Routes tab content --}}
-            <div class="tab-content" id="routes">
-                <a href="{{ route('admin.add.route') }}" class="btn btn-dark my-2">Add Routes</a>
-                <div class="row">
-                    <div class="col-12">
-                       <table class="table table-striped" border>
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Route Number</th>
-                                    <th>Hauler </th>
-                                    <th>Shipp Number</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($routes as $route)
-                                <tr>
-                                    <td>{{ $route->route_number }}</td>
-                                    <td>{{ $route->hname }}</td>
-                                    <td>{{$route->shipNumber}}</td>
-                                   
-                                    <td><a href="{{ route('admin.edit.route',$route->rid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.delete.route',$route->rid) }}" class="btn btn-danger">Delete</a></td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
             {{-- farms tab content --}}
             <div class="tab-content" id="farms">
-                <a href="{{ route('admin.addFarms') }}" class="btn btn-success my-2">Add Farms</a>
                 <div class="row">
                     <div class="col-12">
                        <table class="table table-striped" border>
@@ -350,7 +278,7 @@
                                     <th>Patron ID</th>
                                     <th>Latitude/longitude</th>
                                     <th>Route Number</th>
-                                    <th>Action</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -361,7 +289,6 @@
                                     <td>{{$farm->patron_id}}</td>
                                     <td>{{$farm->latitude}} / {{$farm->longitude}}</td>
                                     <td>{{$farm->route_number}}</td>
-                                    <td><a href="{{ route('admin.edit.farm', $farm->fid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.delete.farm',$farm->fid) }}" class="btn btn-danger">Delete</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -371,7 +298,6 @@
             </div>
             <!-- tanks Tab Content -->
             <div class="tab-content" id="tanks">
-                <a href="{{ route('admin.add.tank') }}" class="btn btn-dark my-2">Add Tanks</a>
                 <div class="row">
                     <div class="col-12">
                         <table class="table table-striped" border>
@@ -382,7 +308,6 @@
                                     <th>Farm ID</th>
                                     <th>Type</th>
                                     <th>Capacity</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -393,7 +318,6 @@
                                     <td>{{$tank->tankFarmId}}</td>
                                     <td>{{$tank->type}}</td>
                                     <td>{{$tank->capacity}} lbs </td>
-                                    <td><a href="{{ route('admin.edit.tank', $tank->tankid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.delete.tank',$tank->tankid) }}" class="btn btn-danger">Delete</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -401,41 +325,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- plants Tab Content -->
-            <div class="tab-content" id="plants">
-                <a href="{{ route('admin.add.plant') }}" class="btn btn-success my-2 ">Add Plant</a>
-                <div class="row">
-                    <div class="col-12">
-                        <table class="table table-striped" border>
-                            <thead>
-                                <th>Plant ID</th>
-                                <th>Plant Name</th>
-                                <th>Plant Address</th>
-                                <th>Plant Email</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Action</th>
-                            </thead>
-                            <tbody>
-                                @foreach ($plants as $plant)
-                                    <tr>
-                                        <td>{{$plant->plant_id}}</td>
-                                        <td>{{$plant->name}}</td>
-                                        <td>{{$plant->address}}</td>
-                                        <td>{{$plant->email}}</td>
-                                        <td>{{$plant->latitude}}</td>
-                                        <td>{{$plant->longitude}}</td>
-                                        <td><a href="{{ route('admin.edit.plant', $plant->id) }}" class="btn btn-primary">Edit</a> <a href="{{ route('admin.delete.plant',$plant->id) }}" class="btn btn-danger">Delete</a></td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        
-                    </div>
-                </div>
-            </div>           
-
 
             <!-- Tickets Tab Content -->
             <div class="tab-content" id="tickets">
@@ -470,8 +359,6 @@
                     </table>
                 </div>
             </div>
-
-
         </div>
     </div>
 

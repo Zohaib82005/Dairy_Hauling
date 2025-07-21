@@ -13,15 +13,17 @@ use App\Models\Truck;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
+
 
 class AdminController extends Controller
 {
     public function adminDashboard()
     {
        $users = User::join('haulers','users.hauler_id','=','haulers.id')
-            ->select('users.id as uid', 'users.name as uname', 'username', 'email', 'password', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
+            ->select('users.id as uid', 'users.name as uname', 'users.username as usname', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
             ->get();
-        $haulers = Hauler::select('id', 'name', 'address', 'shipp_number')->get();
+        $haulers = Hauler::select('id', 'name', 'address','email', 'shipp_number')->get();
         $trucks = Truck::join('haulers', 'trucks.hauler_id', '=', 'haulers.id')
             ->select('trucks.id as tid', 'truck_id', 'hauler_id', 'haulers.name as hauler_name', 'haulers.shipp_number as hauler_number')
             ->get();
@@ -84,6 +86,13 @@ class AdminController extends Controller
         ]);
         return redirect('/admin');
     }
+
+    public function adminHaulerLogin($id){
+        session()->put('haulerLogin', "Yes");
+
+        return redirect()->route('hauler.dashboard',$id);
+    }
+
     public function deleteDriver($id)
     {
         User::where('id', $id)->delete();
@@ -131,13 +140,19 @@ class AdminController extends Controller
     public function addHauler(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:haulers,username',
+            'username' => 'required',
+            'email' =>'required',
+            'password' => 'required',
             'address' => 'required',
-            'shipp_number' => 'required|unique:haulers,shipp_number,except,id'
+            'shipp_number' => 'required|unique:haulers,shipp_number'
         ]);
-
+        $password = Crypt::encrypt($data['password']);
         Hauler::create([
+            'username' => $data['username'],
             'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $password,
             'address' => $data['address'],
             'shipp_number' => $data['shipp_number']
         ]);
@@ -147,23 +162,30 @@ class AdminController extends Controller
 
     public function editHauler($id)
     {
-        $hauler = Hauler::select('id', 'name', 'address', 'shipp_number')
+        $hauler = Hauler::select('id','username','email','password', 'name', 'address', 'shipp_number')
             ->where('id', $id)
             ->first();
+        $password = Crypt::decrypt($hauler->password);
 
-        return view('admin.editHauler', compact('hauler', 'id'));
+        return view('admin.editHauler', compact('hauler', 'id','password'));
     }
 
     public function updateHauler(Request $request, $id)
     {
         $data = $request->validate([
-            'name' => 'required',
+           'name' => 'required',
+            'username' => 'required',
+            'email' =>'required',
+            'password' => 'required',
             'address' => 'required',
             'shipp_number' => 'required'
         ]);
-
+        $password = Crypt::encrypt($data['password']);
         Hauler::where('id', $id)->update([
+            'username' => $data['username'],
             'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $password,
             'address' => $data['address'],
             'shipp_number' => $data['shipp_number']
         ]);
@@ -177,11 +199,7 @@ class AdminController extends Controller
         return redirect('/admin');
     }
 
-    public function addTruck()
-    {
-        $haulers = Hauler::select('id', 'name', 'shipp_number')->get();
-        return view('admin.addTrucks', compact('haulers'));
-    }
+    
 
     public function insertTruck(Request $request)
     {
@@ -450,8 +468,7 @@ class AdminController extends Controller
 
     public function addTrailer()
     {
-        $haulers = Hauler::select('id', 'shipp_number', 'name')->get();
-        return view('admin.addTrailer', compact('haulers'));
+        return view('hauler.addTrailer');
     }
 
     public function insertTrailer(Request $request)

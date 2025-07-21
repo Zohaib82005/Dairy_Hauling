@@ -27,7 +27,9 @@ class User extends Authenticatable
         'licence_number',
         'expiration_date',
         'hauler_id',
-        'email_verified_at'
+        'email_verified_at',
+        'latitude',
+        'longitude'
     ];
 
     /**

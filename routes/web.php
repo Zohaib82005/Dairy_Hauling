@@ -2,11 +2,52 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HaulerController;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckUser;
+use App\Http\Middleware\CheckHauler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
+//haulers routes
+Route::get('/hauler/login', function(){
+    return vieW('haulerLogin');
+});
+
+Route::post('/checkhauler/login',[HaulerController::Class,'haulerLogin'])->name('hauler.login');
+Route::middleware([CheckHauler::class])->group(function(){
+    Route::get('/viewHauler/{id}',[HaulerController::class, 'hauler'])->name('hauler.dashboard');
+// done
+    Route::get('/hauler/addDrivers',function(){
+        return view('hauler.addDriver');
+    })->name('hauler.addDriver');
+    Route::post('/hauler/addDrver',[HaulerController::class, 'addDriver'])->name('hauler.add.driver');
+    Route::get('/hauler/delete/{id}',[HaulerController::class, 'deleteDriver'])->name('hauler.deleteDriver');
+    Route::get('/hauler/drivers/edit/{id}', [HaulerController::class, 'editDriver'])->name('hauler.editDriver');
+    Route::post('/hauler/drivers/update/{id}', [HaulerController::class, 'updateDriver'])->name('hauler.updateDriver');
+//haulers add trucks
+// done
+    Route::get('/hauler/addTrucks',function (){
+        return view('hauler.addTrucks');
+    })->name('hauler.add.trucks');
+    Route::post('/hauler/truck/add',[HaulerController::class,'insertTruck'])->name('hauler.insert.truck');
+    Route::get('/hauler/trucks/edit/{id}', [HaulerController::class, 'editTruck'])->name('hauler.editTruck');
+    Route::post('/hauler/trucks/update/{id}', [HaulerController::class, 'updateTruck'])->name('hauler.updateTruck');
+    Route::get('/hauler/trucks/delete/{id}', [HaulerController::class, 'deleteTruck'])->name('hauler.deleteTruck');
+    
+    //admin Trailers routes done
+    Route::get('/hauler/addTrailer',function(){
+        return view('hauler.addTrailer');
+    })->name('hauler.add.trailer');
+    Route::post('/hauler/insertTrailer',[HaulerController::class, 'insertTrailer'])->name('hauler.insert.trailer');
+    Route::get('/hauler/editTrailer/{id}',[HaulerController::class, 'editTrailer'])->name('hauler.edit.Trailer');
+    Route::post('/hauler/updateTrailer/{id}',[HaulerController::class, 'updateTrailer'])->name('hauler.update.trailer');
+    Route::get('/hauler/deletetrailer/{id}',[HaulerController::class,'deleteTrailer'])->name('hauler.delete.trailer');
+
+ 
+});
 
 //admin routes
 Route::middleware([CheckAdmin::class])->group(function(){
@@ -16,7 +57,7 @@ Route::middleware([CheckAdmin::class])->group(function(){
     Route::post('/addDrver',[AdminController::class, 'addDriver'])->name('admin.add.driver');
     Route::get('/admin/delete/{id}',[AdminController::class, 'deleteDriver'])->name('admin.deleteDriver');
     Route::get('/admin/drivers/edit/{id}', [AdminController::class, 'editDriver'])->name('admin.editDriver');
-    Route::post('/admin/drivers/update/{id}', [App\Http\Controllers\AdminController::class, 'updateDriver'])->name('admin.updateDriver');
+    Route::post('/admin/drivers/update/{id}', [AdminController::class, 'updateDriver'])->name('admin.updateDriver');
 
     // Admin Hauler Routes
     Route::get('/admin/addHauler',function (){
@@ -71,6 +112,8 @@ Route::middleware([CheckAdmin::class])->group(function(){
     Route::get('/admin/routes/editRoutes/{id}',[AdminController::class,'editRoute'])->name('admin.edit.route');
     Route::post('/admin/routes/updateRoutes/{id}',[AdminController::class , 'updateRoute'])->name('admin.update.route');
     Route::get('/admin/deleteRoute/{id}',[AdminController::class, 'deleteRoute'])->name('admin.delete.route');
+
+    Route::get('/admin/{id}/login',[AdminController::class, 'adminHaulerLogin'])->name('hauler.adminSide.login');
 });
 
 
@@ -122,7 +165,22 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::get('/getLocation',function (Request $request){
         session()->put('lat1', $request->latitude);
         session()->put('long1',$request->longitude);
-        return response()->json(['status'=>"Success"]);
+       $updatePos =  User::where('id',Auth::user()->id)
+        ->update([
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude
+        ]);
+
+        // dd($updatePos);
+
+        if($updatePos){
+
+            return response()->json(['status'=>"Success"]);
+
+        }
+        else{
+            return response()->json(['status'=>"not Success"]);
+        }
     });
 });
 

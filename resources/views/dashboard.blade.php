@@ -36,6 +36,7 @@
     <!-- Spinner Start -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <h5 class="text-success">Loading...</h5>
     </div>
     <!-- Spinner End -->    
     <!-- Topbar Start -->
@@ -59,7 +60,7 @@
         </div>
     </div>
     <!-- Topbar End -->
-    <p class="px-3">Home/Login/Dashboard</p>
+    
     <h3 class="px-3">Welcome!</h3>
 
     @if(session('message'))

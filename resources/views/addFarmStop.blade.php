@@ -420,31 +420,35 @@
                 localStorage.setItem('milk', 0);
             }
         }
-
         function calculateStickReadings() {
-
+            console.log(tankHeight);
+            
+            let tHeight = Number(tankHeight);
             let startReading = document.getElementById("startReading").value;
             let endReading = document.getElementById("endReading").value;
+            let sReading = Number(startReading);
+            let eReading = Number(endReading);
+            console.log(startReading);
             // tankHeight = parseFloat(document.getElementById("tankHeight").value);
-            if (startReading > tankHeight) {
+            if (sReading > tHeight) {
                 alert("Start reading can't be greater than tank's height");
                 return;
             }
-            if (startReading < endReading) {
-                alert("Please Enter The Valid Value");
-                return;
-            } else {
-                let height = startReading - endReading;
+            else {
+                let height = sReading - eReading;
 
                 if (tankType == "rectangular") {
                     // console.log(tankWidth);
                     // console.log(tankLength);
                     // console.log(height);
-                    volume = ((tankWidth * tankHeight * tankLength) * 7.48) * 8.6;
+                    let tWidth = Number(tankWidth);
+                    let tLength = Number(tankLength);
+                    volume = ((tWidth * height * tLength) * 7.48) * 8.6;
                     collectedMilk.innerHTML = volume;
                     colMilk.value = volume;
                 } else if (tankType == "cylindrical") {
-                    volume = ((3.14 * tankRadius * tankRadius * height) * 8.6) / 231;
+                    let tRadius = Number(tankRadius);
+                    volume = ((3.14 * tRadius * tRadius * height) * 8.6) / 231;
                     collectedMilk.innerHTML = volume;
                     colMilk.value = volume;
                     localStorage.setItem('milk', volume);

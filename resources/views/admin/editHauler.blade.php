@@ -25,13 +25,31 @@
         <form action="{{ route('admin.updateHauler',$hauler->id) }}" method="POST" class="m-5 p-5 border shadow-lg">
             @csrf
             <div class="row">
-
+                
                 <div class="col-12">
                     <div class="form-floating">
-                        <input type="text" name="name" value="{{ $hauler->name }}" class="form-control my-2" id="FullName" placeholder="Your Full Name">
-                        <label for="FullName">Full Name</label>
+                        <input type="text" name="name" value="{{ $hauler->username }}" class="form-control my-2" id="FullName" placeholder="Your Full Name">
+                        <label for="FullName">Username</label>
                     </div>
                 </div>
+                <div class="col-12">
+                <div class="form-floating">
+                    <input type="text" name="username" value="{{ $hauler->name }}" class="form-control my-2" id="FullName" placeholder="Your Full Name">
+                    <label for="FullName">Full Name</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="text" name="email" value="{{ $hauler->email }}" class="form-control my-2" id="FullName" placeholder="Your Full Name">
+                    <label for="FullName">Email</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="text" name="password" value="{{ $password }}" class="form-control my-2" id="FullName" placeholder="Your Full Name">
+                    <label for="FullName">Password</label>
+                </div>
+            </div>
                 <div class="col-12">
                     <div class="form-floating">
                         <input type="text" name="address" value="{{ $hauler->address }}" class="form-control my-2" id="add" placeholder="Address of Hauler Company">

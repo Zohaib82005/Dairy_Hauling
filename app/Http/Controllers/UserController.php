@@ -260,7 +260,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
 
         $collectedFarms = Farm_stop_scan::join('farms','farms.farm_id','=','farm_stop_scans.farm_id')
         ->join('tanks','farm_stop_scans.tank_id','=','tanks.tank_id')
-        ->select('farms.name as fname','tanks.tank_id as tankId','collected_milk','farm_stop_scans.created_at as farmCollectedAt')
+        ->select('farms.name as fname','method','tanks.tank_id as tankId','collected_milk','farm_stop_scans.created_at as farmCollectedAt')
         ->where('ticket_id', $ticketID)
         ->where('user_id',Auth::user()->id)
         ->get();
@@ -375,21 +375,16 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
     }
 
     public function collectMilkAtPlant(Request $request, $ticketID)
+    
     {
+        // dd($request);
         $method = Farm_stop_scan::select('method')->where('ticket_id',$ticketID)->first();
         $request->validate([
-            'method' => 'required',
-            'temprature' => 'required',
-            'collected_milk' => 'required_if:method,"Scale At Plant"'
+            'temprature',
+            'collected_milk'
         ]);
 
-        // dd($request);
-        // $farms = Farm_stop_scan::join('farms','farms.id','=','farm_stop_scans.farm_id')
-        //         ->join('tanks','tanks.id','=','farm_stop_scans.tank_id')
-        //         ->select('farms.name as fname','tanks.tank_id as tankID')
-        //         ->where('user_id',Auth::user()->id)
-        //         ->where('created_at',now('y-m-d'))
-        //         ->get();
+        
         if ($request->collected_milk == null) {
             Farm_stop_scan::where('user_id', Auth::user()->id)
                 ->where('ticket_id', $ticketID)
@@ -418,7 +413,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'status' => 'completed'
         ]);
         
-            // Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
+        // Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
         
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
