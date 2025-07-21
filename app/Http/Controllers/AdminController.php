@@ -21,7 +21,7 @@ class AdminController extends Controller
     public function adminDashboard()
     {
        $users = User::join('haulers','users.hauler_id','=','haulers.id')
-            ->select('users.id as uid', 'users.name as uname', 'users.username as usname', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
+            ->select('users.id as uid','latitude','longitude', 'users.name as uname', 'users.username as usname', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
             ->get();
         $haulers = Hauler::select('id', 'name', 'address','email', 'shipp_number')->get();
         $trucks = Truck::join('haulers', 'trucks.hauler_id', '=', 'haulers.id')
@@ -89,7 +89,7 @@ class AdminController extends Controller
 
     public function adminHaulerLogin($id){
         session()->put('haulerLogin', "Yes");
-
+        session()->put('haulerId',$id);
         return redirect()->route('hauler.dashboard',$id);
     }
 
@@ -102,7 +102,7 @@ class AdminController extends Controller
     public function editDriver($id)
     {
         $user = User::join('haulers','users.hauler_id','=','haulers.id')
-            ->select('users.id as uid', 'users.name as uname', 'username', 'email', 'password', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
+            ->select('users.id as uid', 'users.name as uname', 'users.username as usName', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
             ->where('users.id', $id)
             ->first();
         $haulers = Hauler::select('id','name','shipp_number')->get();
@@ -580,5 +580,10 @@ class AdminController extends Controller
     {
         Route::where('id', $id)->delete();
         return redirect('/admin');
+    }
+
+    public function viewDriverLocation($id){
+        $userLocation = User::select('latitude','longitude')->where('id',$id)->first();
+        return response()->json($userLocation);
     }
 }

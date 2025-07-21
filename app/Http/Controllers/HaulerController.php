@@ -48,7 +48,7 @@ class HaulerController extends Controller
     }
     public function hauler($id){
         $users = User::join('haulers','users.hauler_id','=','haulers.id')
-            ->select('users.id as uid', 'users.name as uname', 'users.username as usname', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
+            ->select('users.id as uid', 'users.name as uname','latitude','longitude', 'users.username as usname', 'users.email as uemail', 'users.password as upassword', 'cnic', 'users.address as uaddress', 'licence_number', 'expiration_date','haulers.id as haul_id','haulers.name as haulerName','haulers.shipp_number as shipNumber')
             ->where('haulers.id' , $id)
             ->get();
        
@@ -257,5 +257,12 @@ return redirect('/viewHauler/'.session('haulerId'));
         return redirect('/viewHauler/'.session('haulerId'));
     }
 
+    public function viewDriverLocation($id){
+        $userLocation = User::select('latitude','longitude')->where('id',$id)->first();
+        if($userLocation){
+            return response()->json($userLocation);
+        }
+        return response()->json(['latitude'=> "Not Found", 'longitude'=>"Not Found"]);
+    }
 
 }

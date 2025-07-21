@@ -7,6 +7,10 @@
     <title>Milk Hauling Admin Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="shortcut icon" href="{{ asset('images/carousel-1.jpg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('css/adminStyle.css') }}">
 </head>
@@ -25,7 +29,7 @@
                 <i class="fa-solid fa-user"></i> Drivers
             </button>
 
-            
+
 
             <button class="nav-link" data-tab="Trucks">
                 <i class="fas fa-truck"></i> Trucks
@@ -34,7 +38,7 @@
             <button class="nav-link" data-tab="trailers">
                 <i class="fas fa-trailer"></i> Trailers
             </button>
-            
+
 
             <button class="nav-link" data-tab="farms">
                 <i class="fas fa-house-chimney-window"></i> Farms
@@ -93,7 +97,7 @@
                     <div class="col-md-4">
                         <div class="stat-card red">
                             <div class="subtitle">Open tickets</div>
-                            <h3>{{$ticketCount}}</h3>
+                            <h3>{{ $ticketCount }}</h3>
                             <div class="icon">
                                 <i class="fas fa-phone"></i>
                             </div>
@@ -180,32 +184,74 @@
             <div class="tab-content" id="driver">
                 <a href="{{ route('hauler.addDriver') }}" class="btn btn-danger">Add Driver</a>
                 <div class="row">
-                    @foreach ($users as $user)
-
-
-                    <div class="col-lg-4 col-md-6 shadow-lg p-3" style="
+                    @foreach ($users as $index => $user)
+                        <div class="col-lg-4 col-md-6 shadow-lg p-3"
+                            style="
                         overflow:scroll; scrollbar-width:none;">
-                        <h5 class="bg-danger text-white p-1"><b>Name:</b> {{ $user->uname }}</h5>
-                        <div class="row mb-3">
-                            <div class="col-lg-4">
-                                <img src="{{ asset('images/testimonial-1.jpg') }}" class="img-fluid" alt="">
+                            <h5 class="bg-danger text-white p-1"><b>Name:</b> {{ $user->uname }}</h5>
+                            <div class="row mb-3">
+                                <div class="col-lg-4">
+                                    <img src="{{ asset('images/testimonial-1.jpg') }}" class="img-fluid"
+                                        alt="">
+                                </div>
+                                <div class="col-lg-8">
+                                    <p><b>Email:</b> <br>{{ $user->uemail }}</p>
+                                    <p><b>License Number:</b> {{ $user->licence_number }}
+                                    </p>
+                                    <p><b>Expiration Date:</b> {{ $user->expiration_date }}</p>
+                                    <p><b>Address:</b> {{ $user->uaddress }}</p>
+                                    <p><b>Hauler:</b> {{ $user->haulerName }}</p>
+                                </div>
                             </div>
-                            <div class="col-lg-8">
-                                <p><b>Email:</b> <br>{{$user->email}}</p>
-                                <p><b>License Number:</b> {{ $user->licence_number }}
-                                </p>
-                                <p><b>Expiration Date:</b> {{ $user->expiration_date }}</p>
-                                <p><b>Address:</b> {{ $user->uaddress }}</p>
-                                <p><b>Hauler:</b> {{ $user->haulerName }}</p>
+                            <a href="{{ route('hauler.editDriver', $user->uid) }}"
+                                class="btn btn-primary mx-2">Edit</a><a
+                                href="{{ route('hauler.deleteDriver', $user->uid) }}"
+                                class="btn btn-danger">Delete</a>
+                            <button type="button" class="btn btn-success" id="viewLocation-{{ $index }}"
+                                data-toggle="modal"
+                                data-target=".bd-example-modal-sm-{{ $index }}">Location</button>
+
+                            <div class="modal fade bd-example-modal-sm-{{ $index }}" tabindex="-1"
+                                role="dialog" aria-labelledby="mySmallModalLabel">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content text-center">
+                                        <div class="py-2">
+                                            <span class="py-1 d-block"><strong>Latitude: </strong><span
+                                                    id="latitude-{{ $index }}"></span></span>
+                                            <span class="py-1 d-block"><strong>Longitude: </strong><span
+                                                    id="longitude-{{ $index }}"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('hauler.editDriver',$user->uid) }}" class="btn btn-primary mx-2">Edit</a><a href="{{ route('hauler.deleteDriver',$user->uid) }}" class="btn btn-danger">Delete</a>
-                    </div>
+                        <script>
+                            $('#viewLocation-{{ $index }}').click(function() {
+                                lat = document.getElementById('latitude-{{ $index }}');
+                                long = document.getElementById('longitude-{{ $index }}');
+                                $.ajax({
+                                    url: '/hauler/viewLocation/{{ $user->uid }}',
+                                    type: 'GET',
+                                    success: function(response) {
+                                        if(response.latitude == null ){
+                                            lat.innerHTML = "Location is not Updated";
+                                            long.innerHTML = "Location is not Updated";
+                                        }
+                                        else{
+                                        lat.innerHTML = response.latitude;
+                                        long.innerHTML = response.longitude;
+                                        }
+                                        // console.log(response);
+                                    }
+
+                                });
+                            });
+                        </script>
                     @endforeach
                 </div>
             </div>
 
-            
+
             <!-- Trucks Tab Content -->
             <div class="tab-content" id="Trucks">
                 <a href="{{ route('hauler.add.trucks') }}" class="btn btn-primary my-2">Add Trucks</a>
@@ -223,25 +269,28 @@
                             </thead>
                             <tbody>
                                 @foreach ($trucks as $truck)
-                                <tr>
-                                    <td>{{ $truck->hauler_name }}</td>
-                                    <td>{{ $truck->hauler_number }}</td>
-                                    <td>{{$truck->truck_id}}</td>
-                                    <td><a href="{{ route('hauler.editTruck', $truck->tid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('hauler.deleteTruck',$truck->tid) }}" class="btn btn-danger">Delete</a></td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $truck->hauler_name }}</td>
+                                        <td>{{ $truck->hauler_number }}</td>
+                                        <td>{{ $truck->truck_id }}</td>
+                                        <td><a href="{{ route('hauler.editTruck', $truck->tid) }}"
+                                                class="btn btn-primary">Edit</a> <a
+                                                href="{{ route('hauler.deleteTruck', $truck->tid) }}"
+                                                class="btn btn-danger">Delete</a></td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-{{-- Trailers tab content --}}
-<div class="tab-content" id="trailers">
-    <a href="{{ route('hauler.add.trailer') }}" class="btn btn-warning my-2">Add Trailer</a>
+            {{-- Trailers tab content --}}
+            <div class="tab-content" id="trailers">
+                <a href="{{ route('hauler.add.trailer') }}" class="btn btn-warning my-2">Add Trailer</a>
                 <div class="row">
 
                     <div class="col-12">
-                         <table class="table table-striped" border>
+                        <table class="table table-striped" border>
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Hauler Name</th>
@@ -253,13 +302,16 @@
                             </thead>
                             <tbody>
                                 @foreach ($trailers as $trailer)
-                                <tr>
-                                    <td>{{ $trailer->haname }}</td>
-                                    <td>{{ $trailer->shippNumber }}</td>
-                                    <td>{{$trailer->trailer_id}}</td>
-                                    <td>{{$trailer->capacity}}</td>
-                                    <td><a href="{{ route('hauler.edit.Trailer', $trailer->trid) }}" class="btn btn-primary">Edit</a> <a href="{{ route('hauler.delete.trailer',$trailer->trid) }}" class="btn btn-danger">Delete</a></td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $trailer->haname }}</td>
+                                        <td>{{ $trailer->shippNumber }}</td>
+                                        <td>{{ $trailer->trailer_id }}</td>
+                                        <td>{{ $trailer->capacity }}</td>
+                                        <td><a href="{{ route('hauler.edit.Trailer', $trailer->trid) }}"
+                                                class="btn btn-primary">Edit</a> <a
+                                                href="{{ route('hauler.delete.trailer', $trailer->trid) }}"
+                                                class="btn btn-danger">Delete</a></td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -270,7 +322,7 @@
             <div class="tab-content" id="farms">
                 <div class="row">
                     <div class="col-12">
-                       <table class="table table-striped" border>
+                        <table class="table table-striped" border>
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Farm Name</th>
@@ -278,18 +330,18 @@
                                     <th>Patron ID</th>
                                     <th>Latitude/longitude</th>
                                     <th>Route Number</th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($farms as $farm)
-                                <tr>
-                                    <td>{{ $farm->name }}</td>
-                                    <td>{{ $farm->farm_id }}</td>
-                                    <td>{{$farm->patron_id}}</td>
-                                    <td>{{$farm->latitude}} / {{$farm->longitude}}</td>
-                                    <td>{{$farm->route_number}}</td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $farm->name }}</td>
+                                        <td>{{ $farm->farm_id }}</td>
+                                        <td>{{ $farm->patron_id }}</td>
+                                        <td>{{ $farm->latitude }} / {{ $farm->longitude }}</td>
+                                        <td>{{ $farm->route_number }}</td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -312,13 +364,13 @@
                             </thead>
                             <tbody>
                                 @foreach ($tanks as $tank)
-                                <tr>
-                                    <td>{{ $tank->tank_id }}</td>
-                                    <td>{{ $tank->fname }}</td>
-                                    <td>{{$tank->tankFarmId}}</td>
-                                    <td>{{$tank->type}}</td>
-                                    <td>{{$tank->capacity}} lbs </td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $tank->tank_id }}</td>
+                                        <td>{{ $tank->fname }}</td>
+                                        <td>{{ $tank->tankFarmId }}</td>
+                                        <td>{{ $tank->type }}</td>
+                                        <td>{{ $tank->capacity }} lbs </td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -342,18 +394,16 @@
                         </thead>
                         <tbody>
                             @foreach ($tickets as $ticket)
-                           
-                            <tr>
-                                <td>{{$ticket->ticket_number}}</td>
-                                <td>{{$ticket->uname}}</td>
-                                <td>{{$ticket->uemail}}</td>
-                                <td>{{$ticket->truckNumber}}</td>
-                                <td>{{$ticket->trailerNumber}}</td>
-                                <td>{{$ticket->route_number}}</td>
-                                <td>{{$ticket->status}}</td>
-                                <td>{{$ticket->createdAt}}</td>
-                            </tr>
-                                 
+                                <tr>
+                                    <td>{{ $ticket->ticket_number }}</td>
+                                    <td>{{ $ticket->uname }}</td>
+                                    <td>{{ $ticket->uemail }}</td>
+                                    <td>{{ $ticket->truckNumber }}</td>
+                                    <td>{{ $ticket->trailerNumber }}</td>
+                                    <td>{{ $ticket->route_number }}</td>
+                                    <td>{{ $ticket->status }}</td>
+                                    <td>{{ $ticket->createdAt }}</td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -368,6 +418,8 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         // Tab functionality
         document.querySelectorAll('.nav-link').forEach(link => {

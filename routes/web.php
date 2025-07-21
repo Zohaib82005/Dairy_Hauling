@@ -46,7 +46,7 @@ Route::middleware([CheckHauler::class])->group(function(){
     Route::post('/hauler/updateTrailer/{id}',[HaulerController::class, 'updateTrailer'])->name('hauler.update.trailer');
     Route::get('/hauler/deletetrailer/{id}',[HaulerController::class,'deleteTrailer'])->name('hauler.delete.trailer');
 
- 
+    Route::get('/hauler/viewLocation/{id}',[HaulerController::class, 'viewDriverLocation']);
 });
 
 //admin routes
@@ -114,6 +114,7 @@ Route::middleware([CheckAdmin::class])->group(function(){
     Route::get('/admin/deleteRoute/{id}',[AdminController::class, 'deleteRoute'])->name('admin.delete.route');
 
     Route::get('/admin/{id}/login',[AdminController::class, 'adminHaulerLogin'])->name('hauler.adminSide.login');
+    Route::get('/admin/viewLocation/{id}',[AdminController::Class, 'viewDriverLocation'])->name('viewDriver.location');
 });
 
 
@@ -182,5 +183,6 @@ Route::middleware([CheckUser::class])->group(function () {
             return response()->json(['status'=>"not Success"]);
         }
     });
+
 });
 

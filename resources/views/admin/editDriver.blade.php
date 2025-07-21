@@ -35,14 +35,14 @@
                 </div>
                 <div class="col-12">
                     <div class="form-floating">
-                        <input type="text" name="username" value="{{ $user->username }}" class="form-control my-2" id="username" placeholder="Choose Unique Username">
+                        <input type="text" name="username" value="{{ $user->usName }}" class="form-control my-2" id="username" placeholder="Choose Unique Username">
                         <label for="username">Username</label>
                         
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-floating">
-                        <input type="email" name="email" value="{{ $user->email }}" class="form-control my-2" id="email" placeholder="email">
+                        <input type="email" name="email" value="{{ $user->uemail }}" class="form-control my-2" id="email" placeholder="email">
                         <label for="email">Email</label>
                     </div>
                 </div>
