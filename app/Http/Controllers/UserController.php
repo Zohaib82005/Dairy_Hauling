@@ -15,6 +15,7 @@ use App\Models\Tank;
 use App\Models\Ticket;
 use App\Models\Trailer;
 use App\Models\Truck;
+use App\Models\Chat;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -84,7 +85,18 @@ class UserController extends Controller
             // ->Where('status','inactive')
             ->orderBy('tickets.id', 'desc')
             ->get();
-        return view('dashboard', compact('tickets'));
+        $previousTickets = Ticket::join('routes', 'tickets.route_id', '=', 'routes.id')
+            ->join('haulers', 'routes.hauler_id', '=', 'haulers.id')
+            ->join('trucks','tickets.truck_id','=','trucks.id')
+            ->join('trailers','tickets.trailer_id','=','trailers.id')
+            ->select('tickets.id as tkid', 'routes.id as rid', 'status', 'route_number', 'ticket_number', 'haulers.name as hname','trucks.truck_id as truckId','trailers.trailer_id as trailerId')
+            ->where('tickets.user_id', Auth::user()->id)
+            ->where('status','completed')
+            ->orderBy('tickets.id', 'desc')
+            ->get();
+
+            $messages = Chat::select('id','sender_id','receiver_id','message','user_id')->where('user_id',Auth::user()->id)->get();
+        return view('dashboard', compact('tickets','previousTickets','messages'));
     }
 
     public function login(Request $request)
@@ -398,6 +410,8 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
              Farm_stop_scan::where('user_id', Auth::user()->id)
                 ->where('ticket_id', $ticketID)
                 ->where('method', 'Scale At Plant')
+                ->latest() 
+                ->first()
                 ->update(
                     [
                         'temprature' => $request->temprature,
@@ -486,5 +500,36 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             }
         }
         return response()->json(['data'=> "not Found"]);
+    }
+
+    public function sendMessage(Request $request){
+        $request->validate([
+            'message' => 'required',
+        ]);
+
+       $sent =  Chat::create([
+            'sender_id' => Auth::user()->id,
+            'receiver_id' => Auth::user()->hauler_id,
+            'message' => $request->message,
+            'user_id' => Auth::user()->id
+        ]);
+        if($sent){
+            return response()->json(['status'=>"Sent"]);
+            
+        }
+        return response()->json(['status'=>"not Sent"]);
+
+    }
+
+    public function getMessages(){
+        $message = Chat::select('id','sender_id','receiver_id','message','user_id')->where('user_id',Auth::user()->id)->where('status','unseen')->get();
+        if(!($message->isEmpty())){
+            Chat::where('status','unseen')
+            ->update([
+                'status' => 'seen'
+            ]);
+        }
+        return response()->json($message);
+       
     }
 }

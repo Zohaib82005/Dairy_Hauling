@@ -184,5 +184,7 @@ Route::middleware([CheckUser::class])->group(function () {
         }
     });
 
+    Route::post('/sendMessage',[UserController::class, 'sendMessage']);
+    Route::get('/getMessages',[UserController::class, 'getMessages']);
 });
 

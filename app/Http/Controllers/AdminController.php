@@ -11,6 +11,7 @@ use App\Models\Ticket;
 use App\Models\Trailer;
 use App\Models\Truck;
 use App\Models\User;
+use App\Models\Farm_stop_scan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
@@ -49,7 +50,19 @@ class AdminController extends Controller
                     ->orderBy('status','desc')
                     ->get();
         $ticketCount = Ticket::where('status','active')->count();
-        return view('admin.admin', compact('users', 'haulers', 'trucks', 'farms', 'tanks', 'plants', 'trailers', 'routes','tickets','ticketCount'));
+        $collectedMilk = Farm_stop_scan::select('collected_milk','method')->get();
+        $totalMilk = 0;
+        if($collectedMilk != null){
+            foreach($collectedMilk as $cm){
+                if($cm->collected_milk == null){
+                    continue;
+                }
+                $totalMilk = $totalMilk + $cm->collected_milk;
+        }
+        }
+        $totalUser = User::where('role','User')->count();
+        // dd($totalUser);
+        return view('admin.admin', compact('users', 'haulers', 'trucks', 'farms', 'tanks', 'plants', 'trailers', 'routes','tickets','ticketCount','totalMilk','totalUser'));
     }
     public function controlDriver()
     {

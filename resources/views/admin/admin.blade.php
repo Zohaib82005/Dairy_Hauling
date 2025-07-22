@@ -12,6 +12,48 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="shortcut icon" href="{{ asset('images/carousel-1.jpg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('css/adminStyle.css') }}">
+    <style>
+        .flip-card {
+            background-color: transparent;
+            width: 300px;
+            height: 135px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .flip-card-front {
+            background-color: green;
+            color: black;
+        }
+
+        .flip-card-back {
+            background-color: rgb(16, 163, 16);
+            color: white;
+            transform: rotateY(180deg);
+        }
+    </style>
 </head>
 
 <body>
@@ -87,20 +129,26 @@
                     <div class="col-md-4">
                         <div class="stat-card blue">
                             <div class="subtitle">Sign ups</div>
-                            <h3>114</h3>
-                            <div class="change">+25% from last month</div>
+                            <h3>{{ $totalUser }}</h3>
                             <div class="icon">
                                 <i class="fas fa-user"></i>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card green">
-                            <div class="subtitle">Revenue</div>
-                            <h3>$25,541</h3>
-                            <div class="change">+17.5% from last month</div>
-                            <div class="icon">
-                                <i class="fas fa-shopping-cart"></i>
+                        <div class="flip-card rounded">
+                            <div class="flip-card-inner rounded">
+                                <div class="flip-card-front rounded text-white p-5">
+                                    <div class="subtitle">Revenue</div>
+                                    <h3 id="showPrice">${{ $totalMilk }}</h3>
+                                    <input type="hidden" id="totalMilk" value="{{ $totalMilk }}">
+                                    
+                                </div>
+                                <div class="flip-card-back rounded text-dark">
+                                    <p class="py-2">Please Set the Price for 1 Lb</p>
+                                    <input type="number" class="form-control my-2" id="price">
+                                    <button class="btn btn-primary" onclick="setPrice()">Set Price</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -223,29 +271,32 @@
                                 class="btn btn-danger">Delete</a>
                             {{-- <a href="{{  }}" class="btn btn-success">Location</a> --}}
                             <!-- Small modal -->
-                            <button type="button" class="btn btn-success" id="viewLocation-{{ $index }}" data-toggle="modal"
+                            <button type="button" class="btn btn-success" id="viewLocation-{{ $index }}"
+                                data-toggle="modal"
                                 data-target=".bd-example-modal-sm-{{ $index }}">Location</button>
 
-                            <div class="modal fade bd-example-modal-sm-{{ $index }}" tabindex="-1" role="dialog"
-                                aria-labelledby="mySmallModalLabel" >
+                            <div class="modal fade bd-example-modal-sm-{{ $index }}" tabindex="-1"
+                                role="dialog" aria-labelledby="mySmallModalLabel">
                                 <div class="modal-dialog modal-sm">
                                     <div class="modal-content text-center">
                                         <div class="py-2">
-                                        <span class="py-1 d-block"><strong>Latitude: </strong><span id="latitude-{{ $index }}"></span></span>
-                                        <span class="py-1 d-block"><strong>Longitude: </strong><span id="longitude-{{ $index }}"></span></span>
+                                            <span class="py-1 d-block"><strong>Latitude: </strong><span
+                                                    id="latitude-{{ $index }}"></span></span>
+                                            <span class="py-1 d-block"><strong>Longitude: </strong><span
+                                                    id="longitude-{{ $index }}"></span></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <script>
-                            $('#viewLocation-{{ $index }}').click(function(){
+                            $('#viewLocation-{{ $index }}').click(function() {
                                 lat = document.getElementById('latitude-{{ $index }}');
                                 long = document.getElementById('longitude-{{ $index }}');
                                 $.ajax({
                                     url: '/admin/viewLocation/{{ $user->uid }}',
                                     type: 'GET',
-                                    success: function(response){
+                                    success: function(response) {
                                         lat.innerHTML = response.latitude;
                                         long.innerHTML = response.longitude;
                                         // console.log(response);
@@ -546,6 +597,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        let totalMilk = document.getElementById('totalMilk').value;
+        document.getElementById('showPrice').innerHTML ="$    "+ totalMilk * 2;
+        let price, totalPrice;
+        function setPrice(){
+            price = document.getElementById('price').value;
+            totalPrice = price * totalMilk;
+            document.getElementById('showPrice').innerHTML = "$"+totalPrice;
+        }
+
         // Tab functionality
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
