@@ -88,39 +88,42 @@
                 </div>
             </div>
             <div class="container">
+                
+                @foreach ($farmsInRoute as $index => $fir)
                 <div class="my-2">
                     <h5 class="bg-success text-white d-inline p-2 rounded"><i class="bi bi-sign-stop-fill"></i> Next
                         Stop</h5>
                 </div>
-                <script>
-                    let lcate, lat, lon;
-                </script>
-                @foreach ($farmsInRoute as $fir)
-                    <span class="bg-warning p-1"><strong class="text-dark">Farm Name:
-                        </strong>{{ $fir->name }}</span>
-                    <div class="container bg-dark my-2 p-2 rounded">
-                        <h5 class="text-white"><i class="bi bi-geo-alt"></i> Location: </h5>
-                        <p id="lcate" class="text-white">Loading...</p>
-                    </div>
-                    <script>
-                        lcate = document.getElementById("lcate");
-                        lat = "{{ $fir->latitude }}";
-                        lon = "{{ $fir->longitude }}";
+    <span class="bg-warning p-1">
+        <strong class="text-dark">Farm Name:</strong> {{ $fir->name }}
+    </span>
+    <div class="container bg-dark my-2 p-2 rounded">
+        <h5 class="text-white"><i class="bi bi-geo-alt"></i> Location: </h5>
+        <p id="lcate-{{ $index }}" class="text-white">Loading...</p>
+    </div>
+    <script>
+            function calculateLocation(){
 
+                let lcate = document.getElementById("lcate-{{ $index }}");
+                let lat = "{{ $fir->latitude }}";
+                let lon = "{{ $fir->longitude }}";
+                
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    lcate.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
+                })
+                .catch(err => {
+                    lcate.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
+                    lcate.classList.remove('bg-dark');
+                    lcate.parentElement.classList.add('bg-danger');
+                });
+            }
+            calculateLocation();
+        
+    </script>
+@endforeach
 
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                lcate.innerHTML = `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
-                                // console.log(data.display_name);
-                            })
-                            .catch(err => {
-                                lcate.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
-                                lcate.classList.remove('bg-dark');
-                                lcate.parentElement.classList.add('bg-danger');
-                            });
-                    </script>
-                @endforeach
             </div>
             <a href="{{ route('view.farm.stop', $ticketID) }}" class="btn btn-success my-2"><i
                     class="fas fa-plus me-2"></i>Add Farm Stop</a>
@@ -323,7 +326,7 @@ setInterval(() => {
                     longitude: long
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 }
             });
         });

@@ -142,7 +142,7 @@
                                     <div class="subtitle">Revenue</div>
                                     <h3 id="showPrice">${{ $totalMilk }}</h3>
                                     <input type="hidden" id="totalMilk" value="{{ $totalMilk }}">
-                                    
+
                                 </div>
                                 <div class="flip-card-back rounded text-dark">
                                     <p class="py-2">Please Set the Price for 1 Lb</p>
@@ -284,7 +284,13 @@
                                                     id="latitude-{{ $index }}"></span></span>
                                             <span class="py-1 d-block"><strong>Longitude: </strong><span
                                                     id="longitude-{{ $index }}"></span></span>
+                                            <span class="py-2 d-block"><strong>Location: </strong><span
+                                                    id="location-{{ $index }}"></span></span>
                                         </div>
+
+
+
+
                                     </div>
                                 </div>
                             </div>
@@ -293,13 +299,27 @@
                             $('#viewLocation-{{ $index }}').click(function() {
                                 lat = document.getElementById('latitude-{{ $index }}');
                                 long = document.getElementById('longitude-{{ $index }}');
+                                let location = document.getElementById('location-{{ $index }}');
                                 $.ajax({
                                     url: '/admin/viewLocation/{{ $user->uid }}',
                                     type: 'GET',
                                     success: function(response) {
                                         lat.innerHTML = response.latitude;
                                         long.innerHTML = response.longitude;
-                                        // console.log(response);
+                                        fetch(
+                                                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${response.latitude}&lon=${response.longitude}`
+                                                )
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                location.innerHTML =
+                                                    `<i class="bi bi-check-circle me-2"></i>${data.display_name}`;
+                                            })
+                                            .catch(err => {
+                                                location.innerHTML =
+                                                    `<i class="bi bi-exclamation-triangle me-2"></i>Location not found`;
+                                                lcate.classList.remove('bg-dark');
+                                                lcate.parentElement.classList.add('bg-danger');
+                                            });
                                     }
 
                                 });
@@ -598,12 +618,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         let totalMilk = document.getElementById('totalMilk').value;
-        document.getElementById('showPrice').innerHTML ="$    "+ totalMilk * 2;
+        document.getElementById('showPrice').innerHTML = "$    " + totalMilk * 2;
         let price, totalPrice;
-        function setPrice(){
+
+        function setPrice() {
             price = document.getElementById('price').value;
             totalPrice = price * totalMilk;
-            document.getElementById('showPrice').innerHTML = "$"+totalPrice;
+            document.getElementById('showPrice').innerHTML = "$" + totalPrice;
         }
 
         // Tab functionality

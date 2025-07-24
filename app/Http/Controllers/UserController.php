@@ -254,9 +254,8 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
                         ->where('route_id',$routeID->route_id)
                         ->whereNotIn('farm_id',$ticketFarm)
                         ->orderBy('latitude','asc')
-                        
                         ->get();
-        
+        // dd($farmsInRoute);
         // dd($routeID);
         // dd($farmsInRoute);
         $tickets = Ticket::join('routes', 'tickets.route_id', '=', 'routes.id')
@@ -377,7 +376,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'ticketID' => $ticketID,
             'userId' => Auth::user()->id
         ];
-        // Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
+        Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
         return view('destinationPlant', compact('destinationPlant', 'ticketID'));
     }
 
@@ -427,7 +426,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'status' => 'completed'
         ]);
         
-        // Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
+        Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
         
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
@@ -454,7 +453,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'ticketID' => 22,
             'userId' => Auth::user()->id
         ];
-        // Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
+        Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
 
 
         $pdf = Pdf::loadView('pdfsend', $data);

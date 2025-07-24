@@ -256,7 +256,7 @@
         let milkVal = document.getElementById('milkValues');
         milkVal.style.display = "none";
         // document.getElementById("result").style.display = "none";
-        let result = "TR23FARM002TANK002PTR446";
+        let result = "";
         let trackingID = "",
             farmID = "",
             tankID = "",
