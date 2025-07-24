@@ -11,14 +11,58 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <link rel="shortcut icon" href="{{ asset('images/carousel-1.jpg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('css/adminStyle.css') }}">
+    <style>
+        .flip-card {
+            background-color: transparent;
+            width: 300px;
+            height: 135px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .flip-card-front {
+            background-color: green;
+            color: black;
+        }
+
+        .flip-card-back {
+            background-color: rgb(16, 163, 16);
+            color: white;
+            transform: rotateY(180deg);
+        }
+    </style>
 </head>
 
 <body>
     <div class="sidebar">
         <div class="brand">
-            <i class="fas fa-bolt"></i> Milk Hauling Admin
+            <i class="fas fa-bolt"></i> Welcome {{ $haulerName->name }}
         </div>
         <nav class="nav flex-column">
             <button class="nav-link active" data-tab="dashboard">
@@ -52,6 +96,16 @@
                 <i class="fas fa-ticket"></i> Tickets
             </button>
 
+            <button class="nav-link" data-tab="chats">
+                {{-- <div class="row"> --}}
+                    {{-- <div class="col-lg-10"> --}}
+                        <i class="bi bi-chat-dots-fill"></i> Chats &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ $newMessages }}
+                    {{-- </div> --}}
+                    {{-- <div class="col-lg-2">{{$newMessages}}</div> --}}
+                {{-- </div> --}}
+                
+            </button>
+
         </nav>
     </div>
     <div class="main-content">
@@ -77,20 +131,26 @@
                     <div class="col-md-4">
                         <div class="stat-card blue">
                             <div class="subtitle">Sign ups</div>
-                            <h3>114</h3>
-                            <div class="change">+25% from last month</div>
+                            <h3>{{$totalUser}}</h3>
                             <div class="icon">
                                 <i class="fas fa-user"></i>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="stat-card green">
-                            <div class="subtitle">Revenue</div>
-                            <h3>$25,541</h3>
-                            <div class="change">+17.5% from last month</div>
-                            <div class="icon">
-                                <i class="fas fa-shopping-cart"></i>
+                   <div class="col-md-4">
+                        <div class="flip-card rounded">
+                            <div class="flip-card-inner rounded">
+                                <div class="flip-card-front rounded text-white p-5">
+                                    <div class="subtitle">Revenue</div>
+                                    <h3 id="showPrice">${{ $totalMilk }}</h3>
+                                    <input type="hidden" id="totalMilk" value="{{ $totalMilk }}">
+                                    
+                                </div>
+                                <div class="flip-card-back rounded text-dark">
+                                    <p class="py-2">Please Set the Price for 1 Lb</p>
+                                    <input type="number" class="form-control my-2" id="price">
+                                    <button class="btn btn-primary" onclick="setPrice()">Set Price</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -233,13 +293,12 @@
                                     url: '/hauler/viewLocation/{{ $user->uid }}',
                                     type: 'GET',
                                     success: function(response) {
-                                        if(response.latitude == null ){
+                                        if (response.latitude == null) {
                                             lat.innerHTML = "Location is not Updated";
                                             long.innerHTML = "Location is not Updated";
-                                        }
-                                        else{
-                                        lat.innerHTML = response.latitude;
-                                        long.innerHTML = response.longitude;
+                                        } else {
+                                            lat.innerHTML = response.latitude;
+                                            long.innerHTML = response.longitude;
                                         }
                                         // console.log(response);
                                     }
@@ -410,10 +469,32 @@
                 </div>
             </div>
         </div>
+
+
+
+        <div class="tab-content" id="chats">
+            <div class="container" style="width: 786px;">
+                @foreach ($messageUsers as $mu)
+                    <div class="alert alert-primary">
+                        <div class="row">
+                            <div class="col-lg-10">
+                                <h4>{{ $mu->name }}</h4>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ route('view.chat', $mu->uid) }}" class="btn btn-success"
+                                    style="float: right;">View Chat</a>
+
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
     </div>
 
 
 
+    {{-- Chats tab content --}}
 
 
 
@@ -421,6 +502,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+         let totalMilk = document.getElementById('totalMilk').value;
+        document.getElementById('showPrice').innerHTML ="$    "+ totalMilk * 2;
+        let price, totalPrice;
+        function setPrice(){
+            price = document.getElementById('price').value;
+            totalPrice = price * totalMilk;
+            document.getElementById('showPrice').innerHTML = "$"+totalPrice;
+        }
         // Tab functionality
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {

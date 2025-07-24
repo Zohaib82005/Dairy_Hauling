@@ -53,6 +53,7 @@
         #chatMessages {
             flex: 1;
             overflow-y: auto;
+            scrollbar-width: none;
             padding: 10px;
         }
 
@@ -109,16 +110,21 @@
             font-family: Arial, sans-serif;
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
+
+        .prevActivTable{
+            overflow: scroll;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
 <body>
 
     <!-- Spinner Start -->
-    {{-- <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
         <h5 class="text-success">Loading...</h5>
-    </div> --}}
+    </div>
     <!-- Spinner End -->
     <!-- Topbar Start -->
     <div class="container-fluid bg-dark px-0">
@@ -220,6 +226,7 @@
 
     <div class="container p-4" style="border: 2px solid green;">
         <h4 class="text-center text-white bg-success py-2">Your Previous Activities</h4>
+        <div class="prevActivTable">
         <table class="table table-striped border">
             <thead>
                 <tr>
@@ -245,6 +252,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 
 
@@ -330,7 +338,7 @@
                     @if ($m->sender_id == Auth::user()->id)
                         <div class="sentMessages">{{ $m->message }}</div>
                     @elseif ($m->sender_id == Auth::user()->hauler_id)
-                        <div class="receivedMessage">Received Message</div>
+                        <div class="receivedMessage">{{ $m->message }}</div>
                     @endif
                 @endforeach
             @endif

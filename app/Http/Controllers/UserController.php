@@ -297,7 +297,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
         $farms = Farm::join('routes','farms.route_id','=','routes.id')
                 ->join('haulers','haulers.id','=','routes.hauler_id')
                 ->join('users','haulers.id','=','users.hauler_id')
-                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','latitude','longitude')
+                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','farms.latitude as flat','farms.longitude as flong')
                 ->where('haulers.id',Auth::user()->hauler_id)
                 ->where('users.id',Auth::user()->id)
                 ->get();
@@ -466,7 +466,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
         $farms = Farm::join('routes','farms.route_id','=','routes.id')
                 ->join('haulers','haulers.id','=','routes.hauler_id')
                 ->join('users','haulers.id','=','users.hauler_id')
-                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','latitude','longitude')
+                ->select('farms.id as fid','haulers.id as hid','farms.farm_id as farmID','farms.patron_id as farmPtrID','farms.latitude as flat','farms.longitude as flong')
                 ->where('haulers.id',Auth::user()->hauler_id)
                 ->where('users.id',Auth::user()->id)
                 ->get();
@@ -525,6 +525,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
         $message = Chat::select('id','sender_id','receiver_id','message','user_id')->where('user_id',Auth::user()->id)->where('status','unseen')->get();
         if(!($message->isEmpty())){
             Chat::where('status','unseen')
+            ->where('user_id',Auth::user()->id)
             ->update([
                 'status' => 'seen'
             ]);

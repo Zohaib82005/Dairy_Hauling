@@ -47,6 +47,9 @@ Route::middleware([CheckHauler::class])->group(function(){
     Route::get('/hauler/deletetrailer/{id}',[HaulerController::class,'deleteTrailer'])->name('hauler.delete.trailer');
 
     Route::get('/hauler/viewLocation/{id}',[HaulerController::class, 'viewDriverLocation']);
+    Route::get('/hauler/chat/{id}',[HaulerController::class, 'viewChat'])->name('view.chat');
+    Route::post('/sendHaulerMessage',[HaulerController::class, 'sendHaulerMessage']);
+    Route::get('/getHaulerMessages',[HaulerController::class, 'getHaulerMessages']);
 });
 
 //admin routes

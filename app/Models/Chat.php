@@ -11,6 +11,7 @@ class Chat extends Model
         'receiver_id',
         'message',
         'user_id',
-        'status'
+        'status',
+        'hstatus'
     ];
 }

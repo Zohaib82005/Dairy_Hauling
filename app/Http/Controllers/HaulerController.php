@@ -11,6 +11,8 @@ use App\Models\Ticket;
 use App\Models\Trailer;
 use App\Models\Truck;
 use App\Models\User;
+use App\Models\Chat;
+use App\Models\Farm_stop_scan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
@@ -83,7 +85,31 @@ class HaulerController extends Controller
                        ->where('status','active')
                        ->where('users.hauler_id',$id)
                        ->count();
-        return view('hauler.hauler', compact('users',  'trucks', 'trailers','tickets','ticketCount','farms','tanks'));
+
+        $messageUsers = Chat::join('users', 'chats.user_id', '=', 'users.id')
+                    ->select('users.id as uid', 'name')
+                    ->where('receiver_id',session('haulerId'))
+                    ->groupBy('users.id', 'name')
+                    ->orderBy('chats.id','desc')
+                    ->get();
+        $newMessages = Chat::where('hstatus','unseen')->count();
+        $collectedMilk = Farm_stop_scan::join('users','farm_stop_scans.user_id','=','users.id')
+                         ->select('collected_milk','method')
+                         ->where('users.hauler_id',session('haulerId'))
+                         ->get();
+        $totalMilk = 0;
+        if($collectedMilk != null){
+            foreach($collectedMilk as $cm){
+                if($cm->collected_milk == null){
+                    continue;
+                }
+                $totalMilk = $totalMilk + $cm->collected_milk;
+        }
+        }
+        $totalUser = User::where('role','User')->where('hauler_id',session('haulerId'))->count();
+                    // dd($newMessages);
+        $haulerName = Hauler::select('name')->where('id',session('haulerId'))->first();
+        return view('hauler.hauler', compact('users',  'trucks', 'trailers','tickets','ticketCount','farms','tanks','messageUsers','newMessages','totalMilk','totalUser','haulerName'));
     }
 
     public function editDriver($id)
@@ -265,4 +291,53 @@ return redirect('/viewHauler/'.session('haulerId'));
         return response()->json(['latitude'=> "Not Found", 'longitude'=>"Not Found"]);
     }
 
+    public function viewChat($id){
+        $userName = User::select('name')->where('id',$id)->first();
+        $messages = Chat::select('id','sender_id','receiver_id','user_id','message')->where('user_id',$id)->get();
+        Chat::where('hstatus','unseen')
+        ->update([
+            'hstatus'=>'seen'
+        ]);
+        return view('hauler.chat',compact('messages','id','userName'));
+    }
+
+    public function sendHaulerMessage(Request $request){
+        $request->validate([
+            'message' => 'required',
+            'senderId' => 'required',
+            'receiverId' => 'required'
+        ]);
+
+       $sent =  Chat::create([
+            'sender_id' => $request->senderId,
+            'receiver_id' => $request->receiverId,
+            'message' => $request->message,
+            'user_id' => $request->receiverId
+        ]);
+        if($sent){
+            return response()->json(['status'=>"Sent"]);
+            
+        }
+        return response()->json(['status'=>"not Sent"]);
+    }
+
+    public function getHaulerMessages(Request $request){
+        $request->validate([
+            'userid' => 'required'
+        ]);
+        $message = Chat::select('id','sender_id','receiver_id','message','user_id')->where('user_id',$request->userid)->where('hstatus','unseen')->get();
+
+        if(!($message->isEmpty())){
+            Chat::where('hstatus','unseen')
+            ->where('user_id',$request->userid)
+            ->update([
+                'hstatus' => 'seen'
+            ]);
+        }
+
+        // dd($message);
+        
+        return response()->json($message);
+       
+    }
 }
