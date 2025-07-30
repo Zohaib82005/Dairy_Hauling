@@ -12,7 +12,7 @@
 </head>
 
 <body class="">
-    <h5 class="text-center bg-success p-1 text-white">Add Trucks of Haulers</h5>
+    <h5 class="text-center bg-success p-1 text-white">Add Plants of Haulers</h5>
     @if ($errors->any())
     @foreach ($errors->all() as $error)
             <div class="alert alert-danger">{{$error}}</div>

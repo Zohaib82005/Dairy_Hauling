@@ -481,7 +481,13 @@ class AdminController extends Controller
 
     public function addTrailer()
     {
-        return view('hauler.addTrailer');
+        $haulers = Hauler::select('id','name','shipp_number')->get();
+        return view('admin.addTrailer',compact('haulers'));
+    }
+
+    public function addTruck(){
+        $haulers = Hauler::select('id','name','shipp_number')->get();
+        return view('admin.addTrucks',compact('haulers'));
     }
 
     public function insertTrailer(Request $request)

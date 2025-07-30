@@ -104,7 +104,7 @@
                         <input type="hidden" value="" id="patron_id" name="patron_id">
                         <button type="submit" class="btn btn-success float-right" id="checkBtn">Stop Scan</button>
 
-
+                        <h4 class="text-center" id="status"></h4>
 
                     </div>
                 </div>
@@ -251,12 +251,14 @@
 
 
     <script>
+        let status = document.getElementById('status');
+        status.display = "none";
         let showMethod = document.getElementById('getMethod');
         showMethod.style.display = "none";
         let milkVal = document.getElementById('milkValues');
         milkVal.style.display = "none";
         // document.getElementById("result").style.display = "none";
-        let result = "";
+        let result = "null";
         let trackingID = "",
             farmID = "",
             tankID = "",
@@ -293,7 +295,7 @@
             }, 50);
 
         });
-        console.log("scanning");
+        // console.log("scanning");
 
         
         let fid = document.getElementById('fid');
@@ -302,6 +304,8 @@
 
         let tankHeight, tankWidth, tankRadius, tankLength, tankType;
         $('#checkBtn').click(function() {
+            status.display = "block";
+            status.innerHTML = "Please Wait...";
             for (let i = 0; i < result.length; i++) {
             if (i < 4) {
                 trackingID = trackingID + result[i];
@@ -317,12 +321,12 @@
         farm.value = farmID;
         tank.value = tankID;
         patron.value = patronID;
-        console.log(track.value);
-        console.log(tank.value);
-        console.log(farm.value);
-        console.log(patron.value);
-                    console.log(result);
-            console.log('button clicked');
+        // console.log(track.value);
+        // console.log(tank.value);
+        // console.log(farm.value);
+        // console.log(patron.value);
+                    // console.log(result);
+            // console.log('button clicked');
             let trackingid = $('#tracking_id').val();
             let farmid = $('#farm_id').val();
             let tankid = $('#tank_id').val();
@@ -356,7 +360,9 @@
                     else{
                         showMethod.style.display = "block";
                         showMethod.style.color = "white";
-                        showMethod.innerHTML = "Sorry We don't have this tank or farm in database or this farm doesn't belongs to your Hauler OR  the tank does not belong to this farm";
+                        // console.log(result);
+                        status.innerHTML = "Please Scan Again!";
+                        showMethod.innerHTML = "Sorry We don't have this tank OR  the tank does not belong to this farm";
                     }
                     
 
@@ -428,7 +434,7 @@
             let endReading = document.getElementById("endReading").value;
             let sReading = Number(startReading);
             let eReading = Number(endReading);
-            console.log(startReading);
+            // console.log(startReading);
             // tankHeight = parseFloat(document.getElementById("tankHeight").value);
             if (sReading > tHeight) {
                 alert("Start reading can't be greater than tank's height");
