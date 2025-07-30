@@ -77,6 +77,7 @@
                     <div class="dropdown-menu bg-light m-0">
                         <a href="{{ route('signup') }}" class="dropdown-item">SignUp</a>
                         <a href="{{ route('user.login') }}" class="dropdown-item">Login</a>
+                        <a href="{{ route('hauler.gologin') }}" class="dropdown-item">Hauler Login</a>
                     
                        
                     </div>

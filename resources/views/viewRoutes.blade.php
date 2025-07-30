@@ -127,7 +127,7 @@
             </div>
             <a href="{{ route('view.farm.stop', $ticketID) }}" class="btn btn-success my-2"><i
                     class="fas fa-plus me-2"></i>Add Farm Stop</a>
-            <a href="{{ route('destinationPlant', $ticketID) }}" onclick="closeLoad()" class="btn btn-success my-2"><i
+            <a href="{{ route('destinationPlant', $ticketID) }}" onclick="closeLoad()" class="btn btn-success my-2 confirm-link"><i
                     class="fas fa-stop me-2"></i>Close
                 Load</a>
 
@@ -309,11 +309,19 @@ session()->put('arrivalTime', $formattedTime);
     <script src="{{ asset('js/main.js') }}"></script>
     <img src="" alt="" id="mapholder">
     <script>
-        function closeLoad() {
-            alert(
-                "Your milk collection will be completed and you will enter at your destination plant and email will be send to plant with your estimated arrival time"
-            );
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.confirm-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // Stop the default navigation
+                const proceed = confirm("Are you sure you want to close the load?");
+                if (proceed) {
+                    // Optional: Call any function like closeLoad()
+                    // Then navigate manually
+                    window.location.href = this.href;
+                }
+            });
+        });
+    });
 setInterval(() => {
     navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;

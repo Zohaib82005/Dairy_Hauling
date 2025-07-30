@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 //haulers routes
 Route::get('/hauler/login', function(){
     return vieW('haulerLogin');
-});
+})->name('hauler.gologin');
 
 Route::post('/checkhauler/login',[HaulerController::Class,'haulerLogin'])->name('hauler.login');
 Route::middleware([CheckHauler::class])->group(function(){
