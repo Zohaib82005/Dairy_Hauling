@@ -376,7 +376,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'ticketID' => $ticketID,
             'userId' => Auth::user()->id
         ];
-        Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
+        // Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
         return view('destinationPlant', compact('destinationPlant', 'ticketID'));
     }
 
@@ -426,7 +426,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'status' => 'completed'
         ]);
         
-        Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
+        // Mail::to("mzohaibfakhar786@gmail.com")->send(new RouteCompletedMail($ticketID));
         
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
@@ -443,7 +443,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'ticketID' => $ticketID,
             'userId' => Auth::user()->id
         ];
-        Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
+        // Mail::to('mzohaibfakhar786@gmail.com')->send(new SendPdfMail($data));
         return redirect('/dashboard')->with('message', 'Congratulations!😍 You have Completed your Route Successfully.');
     }
     public function sendPdf()

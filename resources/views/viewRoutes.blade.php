@@ -184,19 +184,19 @@
                 ->select('latitude', 'longitude')
                 ->where('route_number', $tickets->route_number)
                 ->first();
-            // dd($destinationPlant);
-            $lat2 = $desPlant->latitude;
-            $long2 = $desPlant->longitude;
-            $lat1 = session('lat1');
-            $long1 = session('long1');
+            // dd($desPlant);
+            $lat2 =(double) $desPlant->latitude;
+            $long2 = (double)$desPlant->longitude;
+            $lat1 =(double) session('lat1');
+            $long1 =(double) session('long1');
             function distanceBtw($lat1, $lon1, $lat2, $lon2)
             {
                 $R = 6371; // Earth's radius in km
 
-    $lat1 = deg2rad($lat1);
-    $lon1 = deg2rad($lon1);
-    $lat2 = deg2rad($lat2);
-    $lon2 = deg2rad($lon2);
+    $lat1 = (3.14/180) * $lat1;
+    $lon1 = (3.14/180)*($lon1);
+    $lat2 = (3.14/180)*($lat2);
+    $lon2 = (3.14/180)*($lon2);
 
     $dlat = $lat2 - $lat1;
     $dlon = $lon2 - $lon1;
@@ -208,11 +208,11 @@
 }
 
 $speed = 70;
-$distance = distanceBtw($lat1, $long1, $lat2, $long2); // km
+$distance = distanceBtw($lat1, $long1, $lat2, $long2);
 session()->put('distance', $distance);
 $timeInHours = $distance / $speed;
 $totalSeconds = $timeInHours * 3600;
-
+// dd($distance);
 $hours = floor($totalSeconds / 3600);
 $minutes = floor(($totalSeconds % 3600) / 60);
 $seconds = floor($totalSeconds % 60);

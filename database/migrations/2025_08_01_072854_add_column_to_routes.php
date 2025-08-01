@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->enum('status',['active','inactive','completed'])->default('active');
+        Schema::table('routes', function (Blueprint $table) {
+            $table->unsignedBigInteger('destination_plant');
+            $table->foreign('destination_plant')->references('id')->on('plants');
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tickets', function (Blueprint $table) {
+        Schema::table('routes', function (Blueprint $table) {
             //
         });
     }

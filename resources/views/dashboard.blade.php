@@ -359,45 +359,43 @@
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-        let chatbox = document.getElementById('chatbox');
-        chatbox.style.visibility = "hidden";
+     let chatbox = document.getElementById('chatbox');
+    chatbox.style.visibility = "hidden";
 
+    function showChatBox() {
+        if (chatbox.style.visibility === "hidden") {
+            chatbox.style.visibility = "visible";
+        } else {
+            chatbox.style.visibility = "hidden";
+        }
+    }
 
+    function scrollToBottom() {
+        let chatMessages = document.getElementById("chatMessages");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-        function showChatBox() {
-            if (chatbox.style.visibility == "hidden") {
-                chatbox.style.visibility = "visible";
-            } else {
-                chatbox.style.visibility = "hidden";
+    window.onload = scrollToBottom;
+
+    function sendMessage() {
+        let messages = document.getElementById('messagebox').value;
+        $.ajax({
+            url: '/sendMessage',
+            type: 'POST',
+            data: {
+                message: messages,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#messagebox').val('');
+                scrollToBottom();
             }
-        }
-
-        function scrollToBottom() {
-            let chatMessages = document.getElementById("chatMessages");
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        window.onload = scrollToBottom;
-        let messages;
-
-        function sendMessage() {
-            messages = document.getElementById('messagebox').value;
-            $.ajax({
-                url: '/sendMessage',
-                type: 'POST',
-                data: {
-                    message: messages,
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    $('#messagebox').val('');
-                }
-            });
-
-        }
+        });
+    }
         let userId = {{ Auth::user()->id }};
-        let haulerId = {{ Auth::user()->hauler_id }};
-
+        let haulerId = ({{ Auth::user()->hauler_id }}) ? {{ Auth::user()->hauler_id }} : 0 ;
+console.log(haulerId);
+console.log(userId);
         function viewMessage() {
             $.ajax({
                 url: '/getMessages',
@@ -417,7 +415,7 @@
             });
         }
 
-        setInterval(viewMessage, 500);
+        setInterval(viewMessage, 900);
 
 
         let cpalert = document.getElementById("completeProfileAlert");

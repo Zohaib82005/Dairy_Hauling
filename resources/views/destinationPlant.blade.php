@@ -124,7 +124,7 @@
                 <form action="{{ route('collect.at.plant', $ticketID) }}" method="POST" l>
                     @csrf
                     @php
-                        $method = DB::table('farm_stop_scans')->select('method')->where('ticket_id',$ticketID)->first();
+                        $method = DB::table('farm_stop_scans')->select('method')->where('ticket_id',$ticketID)->where('method','Scale At Plant')->first();
                         // dd($method);
                     @endphp
                         @if($method != null)
