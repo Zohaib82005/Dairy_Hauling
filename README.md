@@ -43,7 +43,7 @@ This web-based platform streamlines the operations of milk haulers, farms, and d
 
 ### 📷 Barcode Scanning
 - Barcode format: `TR01FARM001TANK001PTR445`
-- Extracts: Route ID, Farm ID, Tank ID, Patron ID
+- Extracts: Tracking ID, Farm ID, Tank ID, Patron ID
 - Works via phone camera (using `BarcodeDetector` JS API)
 
 ### 🧾 PDF Ticket Generation
@@ -56,13 +56,12 @@ This web-based platform streamlines the operations of milk haulers, farms, and d
 
 ## 💬 Chat Module (New Feature)
 - Drivers can **chat with their assigned hauler**
-- Stored messages by user_id, hauler_id
 
 ---
 
 ## 🧠 Tech Stack
 
-- **Backend:** Laravel 10 (MVC)
+- **Backend:** Laravel 12 (MVC)
 - **Database:** MySQL
 - **Frontend:** Blade + Bootstrap 5
 - **Barcode Detection:** BarcodeDetector API + JS
