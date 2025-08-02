@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('farm_stop_scans', function (Blueprint $table) {
-            $table->decimal('temprature');
+            $table->decimal('temprature')->nullable();
         });
     }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('tank_id');
             $table->string('farm_id');
             $table->string('patron_id');
+            $table->enum('method',['Stick Reading','Scale At Plant','Estimated Value','Scale At Farm']);
             $table->timestamps();
         });
     }
