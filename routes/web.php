@@ -50,6 +50,8 @@ Route::middleware([CheckHauler::class])->group(function(){
     Route::get('/hauler/chat/{id}',[HaulerController::class, 'viewChat'])->name('view.chat');
     Route::post('/sendHaulerMessage',[HaulerController::class, 'sendHaulerMessage']);
     Route::get('/getHaulerMessages',[HaulerController::class, 'getHaulerMessages']);
+
+    Route::get('/getUserProgress/{id}',[HaulerController::class, 'getUserProgress']);
 });
 
 //admin routes
@@ -185,9 +187,10 @@ Route::middleware([CheckUser::class])->group(function () {
         else{
             return response()->json(['status'=>"not Success"]);
         }
+        Route::post('/sendMessage',[UserController::class, 'sendMessage']);
+        Route::get('/getMessages',[UserController::class, 'getMessages']);
     });
 
-    Route::post('/sendMessage',[UserController::class, 'sendMessage']);
-    Route::get('/getMessages',[UserController::class, 'getMessages']);
+    
 });
 

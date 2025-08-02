@@ -351,8 +351,7 @@ $ticketFarm = Farm_stop_scan::where('ticket_id', $ticketID)
             'patron_id' => $request->ticketID,
             'method' => $request->method,
             'ticket_id' => $request->ticketID,
-            'user_id' => Auth::user()->id,
-            'created_at' => (now()->format('y-m-d'))
+            'user_id' => Auth::user()->id
 
         ]);
 

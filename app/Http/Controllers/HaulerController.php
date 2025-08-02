@@ -109,7 +109,14 @@ class HaulerController extends Controller
         $totalUser = User::where('role','User')->where('hauler_id',session('haulerId'))->count();
                     // dd($newMessages);
         $haulerName = Hauler::select('name')->where('id',session('haulerId'))->first();
-        return view('hauler.hauler', compact('users',  'trucks', 'trailers','tickets','ticketCount','farms','tanks','messageUsers','newMessages','totalMilk','totalUser','haulerName'));
+
+        $activeUsers = User::join('tickets','users.id','=','tickets.user_id')
+                        ->select('users.id as uid')
+                        ->where('tickets.status','active')
+                        ->where('users.hauler_id',$id)
+                        ->get();
+        // dd($activeUsers);
+        return view('hauler.hauler', compact('activeUsers','users',  'trucks', 'trailers','tickets','ticketCount','farms','tanks','messageUsers','newMessages','totalMilk','totalUser','haulerName'));
     }
 
     public function editDriver($id)
@@ -339,5 +346,13 @@ return redirect('/viewHauler/'.session('haulerId'));
         
         return response()->json($message);
        
+    }
+
+    public function getUserProgress($id){
+        $userProgress = Farm_stop_scan::join('farms','farm_stop_scans.farm_id','=','farms.farm_id')
+                        ->join('tickets','farm_stop_scans.ticket_id','=','tickets.id')
+                        ->select('farm_stop_scans.created_at as stopTime','farms.name as fname','collected_milk as totalMilk')->where('farm_stop_scans.user_id',$id)->where('status','active')->get();
+
+        return response()->json(['userProgress'=>$userProgress]);
     }
 }

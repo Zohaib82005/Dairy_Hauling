@@ -98,12 +98,13 @@
 
             <button class="nav-link" data-tab="chats">
                 {{-- <div class="row"> --}}
-                    {{-- <div class="col-lg-10"> --}}
-                        <i class="bi bi-chat-dots-fill"></i> Chats &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ $newMessages }}
-                    {{-- </div> --}}
-                    {{-- <div class="col-lg-2">{{$newMessages}}</div> --}}
+                {{-- <div class="col-lg-10"> --}}
+                <i class="bi bi-chat-dots-fill"></i> Chats &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ $newMessages }}
                 {{-- </div> --}}
-                
+                {{-- <div class="col-lg-2">{{$newMessages}}</div> --}}
+                {{-- </div> --}}
+
             </button>
 
         </nav>
@@ -131,20 +132,20 @@
                     <div class="col-md-4">
                         <div class="stat-card blue">
                             <div class="subtitle">Sign ups</div>
-                            <h3>{{$totalUser}}</h3>
+                            <h3>{{ $totalUser }}</h3>
                             <div class="icon">
                                 <i class="fas fa-user"></i>
                             </div>
                         </div>
                     </div>
-                   <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="flip-card rounded">
                             <div class="flip-card-inner rounded">
                                 <div class="flip-card-front rounded text-white p-5">
                                     <div class="subtitle">Revenue</div>
                                     <h3 id="showPrice">${{ $totalMilk }}</h3>
                                     <input type="hidden" id="totalMilk" value="{{ $totalMilk }}">
-                                    
+
                                 </div>
                                 <div class="flip-card-back rounded text-dark">
                                     <p class="py-2">Please Set the Price for 1 Lb</p>
@@ -248,7 +249,20 @@
                         <div class="col-lg-4 col-md-6 shadow-lg p-3"
                             style="
                         overflow:scroll; scrollbar-width:none;">
-                            <h5 class="bg-danger text-white p-1"><b>Name:</b> {{ $user->uname }}</h5>
+                            <div class="row bg-danger text-white p-1">
+                                <div class="col-lg-10">
+                                    <h5 class=""><b>Name:</b> {{ $user->uname }} </h5>
+                                </div>
+                                <div class="col-lg-2">
+                                    @foreach ($activeUsers as $ac)
+                                        @if ($ac->uid == $user->uid)
+                                            <i class="fa-solid fa-circle m-2"
+                                                style="font-size: 20px; color: rgb(4, 211, 4);"></i>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                            </div>
                             <div class="row mb-3">
                                 <div class="col-lg-4">
                                     <img src="{{ asset('images/testimonial-1.jpg') }}" class="img-fluid"
@@ -267,6 +281,58 @@
                                 class="btn btn-primary mx-2">Edit</a><a
                                 href="{{ route('hauler.deleteDriver', $user->uid) }}"
                                 class="btn btn-danger">Delete</a>
+                            <button type="button" class="btn btn-warning" id="showProgress-{{ $index }}"
+                                data-toggle="modal" data-target=".bd-progress-modal-sm-{{ $index }}">Show
+                                Progress</button>
+
+                            <div class="modal fade bd-progress-modal-sm-{{ $index }}" tabindex="-1"
+                                role="dialog" aria-labelledby="mySmallModalLabel">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content text-center">
+                                        <div class="py-2 cont-{{ $index }}">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                <tr>
+                                                        <th>Farm Name </th>
+                                                        <th>Stop Time </th>
+                                                        <th>Collected Milk</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody-{{$index}}">
+                                                    <tr class="tr-{{$index}}">
+                                                        
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                $('#showProgress-{{ $index }}').click(function() {
+                                    $.ajax({
+                                        url: '/getUserProgress/{{ $user->uid }}',
+                                        type: 'GET',
+                                        success: function(response) {
+                                            let progress = response.userProgress;
+
+                                            $('.tbody-{{$index}}').empty();
+                                            progress.forEach(function(item) {
+                                                $('.tbody-{{$index}}').append(`<tr><td>${item.fname}</td><td>${item.stopTime}</td><td>${item.totalMilk}</td></tr>`);
+                                                // console.log('Farm Name:', item.fname);
+                                                // console.log('Stop Time:', item.stopTime);
+                                                // console.log('Milk:', item.totalMilk);
+                                            });
+                                        },
+                                        error: function(xhr) {
+
+                                            console.log('Response Text:', xhr.responseText);
+                                        }
+
+                                    });
+                                })
+                            </script>
+
                             <button type="button" class="btn btn-success" id="viewLocation-{{ $index }}"
                                 data-toggle="modal"
                                 data-target=".bd-example-modal-sm-{{ $index }}">Location</button>
@@ -502,13 +568,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-         let totalMilk = document.getElementById('totalMilk').value;
-        document.getElementById('showPrice').innerHTML ="$    "+ totalMilk * 2;
+        let totalMilk = document.getElementById('totalMilk').value;
+        document.getElementById('showPrice').innerHTML = "$    " + totalMilk * 2;
         let price, totalPrice;
-        function setPrice(){
+
+        function setPrice() {
             price = document.getElementById('price').value;
             totalPrice = price * totalMilk;
-            document.getElementById('showPrice').innerHTML = "$"+totalPrice;
+            document.getElementById('showPrice').innerHTML = "$" + totalPrice;
         }
         // Tab functionality
         document.querySelectorAll('.nav-link').forEach(link => {
