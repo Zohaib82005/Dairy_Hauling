@@ -111,7 +111,7 @@
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
 
-        .prevActivTable{
+        .prevActivTable {
             overflow: scroll;
             scrollbar-width: none;
         }
@@ -119,9 +119,10 @@
 </head>
 
 <body>
-    
+
     <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
         <h5 class="text-success">Loading...</h5>
     </div>
@@ -227,31 +228,31 @@
     <div class="container p-4" style="border: 2px solid green;">
         <h4 class="text-center text-white bg-success py-2">Your Previous Activities</h4>
         <div class="prevActivTable">
-        <table class="table table-striped border">
-            <thead>
-                <tr>
-                    <th>Hauler Name</th>
-                    <th>Ticket Number</th>
-                    <th>Route Number</th>
-                    <th>Trcuk ID</th>
-                    <th>Trailer ID</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($previousTickets as $pt)
+            <table class="table table-striped border">
+                <thead>
                     <tr>
-                        <td>{{ $pt->hname }}</td>
-                        <td>{{ $pt->ticket_number }}</td>
-                        <td>{{ $pt->route_number }}</td>
-                        <td>{{ $pt->truckId }}</td>
-                        <td>{{ $pt->trailerId }}</td>
-
-                        <td>{{ $pt->status }}</td>
+                        <th>Hauler Name</th>
+                        <th>Ticket Number</th>
+                        <th>Route Number</th>
+                        <th>Trcuk ID</th>
+                        <th>Trailer ID</th>
+                        <th>Status</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($previousTickets as $pt)
+                        <tr>
+                            <td>{{ $pt->hname }}</td>
+                            <td>{{ $pt->ticket_number }}</td>
+                            <td>{{ $pt->route_number }}</td>
+                            <td>{{ $pt->truckId }}</td>
+                            <td>{{ $pt->trailerId }}</td>
+
+                            <td>{{ $pt->status }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -328,9 +329,11 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top"><i
             class="bi bi-arrow-up"></i></a>
-    <button class="btn btn-success chat" onclick="showChatBox()" title="Chat with Your Hauler"><i
+            <!-- Chat Box -->
+    <button class="btn btn-success chat" id="chatBtn" onclick="showChatBox()" title="Chat with Your Hauler"><i
             class="bi bi-chat-dots-fill"></i></button>
-    <div class="container chatbox" id="chatbox">
+            <div id="chatbox">
+    <div class="container chatbox" >
         <h4 class="text-center border bg-white rounded">Chat</h4>
         <div id="chatMessages">
             @if ($messages)
@@ -348,6 +351,7 @@
             <button class="btn btn-success" id="sendBtn" onclick="sendMessage()">Send</button>
         </div>
     </div>
+    </div>
 
 
     <!-- JavaScript Libraries -->
@@ -359,43 +363,51 @@
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
-     let chatbox = document.getElementById('chatbox');
-    chatbox.style.visibility = "hidden";
+        let chatbox = document.getElementById('chatbox');
+        chatbox.style.display = "none";
 
-    function showChatBox() {
-        if (chatbox.style.visibility === "hidden") {
-            chatbox.style.visibility = "visible";
-        } else {
-            chatbox.style.visibility = "hidden";
-        }
-    }
-
-    function scrollToBottom() {
-        let chatMessages = document.getElementById("chatMessages");
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    window.onload = scrollToBottom;
-
-    function sendMessage() {
-        let messages = document.getElementById('messagebox').value;
-        $.ajax({
-            url: '/sendMessage',
-            type: 'POST',
-            data: {
-                message: messages,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                $('#messagebox').val('');
-                scrollToBottom();
+        function showChatBox() {
+            if (chatbox.style.display === "none") {
+                chatbox.style.display = "block";
+                setTimeout(scrollToBottom, 100);
+            } else {
+                chatbox.style.display = "none";
             }
-        });
-    }
+        }
+
+        function scrollToBottom() {
+            let chatMessages = document.getElementById("chatMessages");
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        window.onload = scrollToBottom;
+
+        function sendMessage() {
+            let messages = document.getElementById('messagebox').value;
+            $.ajax({
+                url: '/sendMessage',
+                type: 'POST',
+                data: {
+                    message: messages,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+
+                    $('#messagebox').val('');
+                    scrollToBottom();
+                },
+                error: function(xhr) {
+
+                    console.log('Response Text:', xhr.responseText);
+                }
+
+            });
+        }
         let userId = {{ Auth::user()->id }};
-        let haulerId = ({{ Auth::user()->hauler_id }}) ? {{ Auth::user()->hauler_id }} : 0 ;
-console.log(haulerId);
-console.log(userId);
+        let haulerId = {{ Auth::user()->hauler_id ? Auth::user()->hauler_id : 0}};
+        console.log(haulerId);
+        console.log(userId);
+
         function viewMessage() {
             $.ajax({
                 url: '/getMessages',
@@ -411,20 +423,25 @@ console.log(userId);
 
                         scrollToBottom();
                     });
+                },
+                error: function(xhr) {
+                    console.log('Response Text:', xhr.responseText);
                 }
             });
         }
-
+        // viewMessage();
         setInterval(viewMessage, 900);
 
 
         let cpalert = document.getElementById("completeProfileAlert");
         let ticket = document.getElementById("ticket");
-
+        let chatBtn = document.getElementById("chatBtn");
         if (cpalert) {
             ticket.classList.add('disabled');
+            chatBtn.classList.add('disabled');
         } else {
             ticket.classList.remove('disabled');
+            chatBtn.classList.remove('disabled');
         }
 
         function showTicketAlert() {

@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('farm_stop_scans', function (Blueprint $table) {
-            //
+            $table->decimal('temprature');
         });
     }
 };

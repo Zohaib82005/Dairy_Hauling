@@ -127,15 +127,15 @@
                         $method = DB::table('farm_stop_scans')->select('method')->where('ticket_id',$ticketID)->where('method','Scale At Plant')->first();
                         // dd($method);
                     @endphp
-                        @if($method != null)
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="form-floating">
                                 <input type="number" class="form-control" step="any" required name="temprature"
-                                    id="temprature" placeholder="Temperature">
+                                id="temprature" placeholder="Temperature">
                                 <label for="temprature">Milk Temperature (°F)</label>
                             </div>
                         </div>
+                        @if($method != null)
                         @if ($method->method == "Scale At Plant")
                             
                         <div class="col-md-6" id="tankReading">

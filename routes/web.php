@@ -187,10 +187,10 @@ Route::middleware([CheckUser::class])->group(function () {
         else{
             return response()->json(['status'=>"not Success"]);
         }
-        Route::post('/sendMessage',[UserController::class, 'sendMessage']);
-        Route::get('/getMessages',[UserController::class, 'getMessages']);
+        
     });
 
-    
+    Route::post('/sendMessage',[UserController::class, 'sendMessage']);
+    Route::get('/getMessages',[UserController::class, 'getMessages']);
 });
 

@@ -600,7 +600,7 @@ class AdminController extends Controller
         Route::where('id', $id)->delete();
         return redirect('/admin');
     }
-
+    
     public function viewDriverLocation($id){
         $userLocation = User::select('latitude','longitude')->where('id',$id)->first();
         return response()->json($userLocation);

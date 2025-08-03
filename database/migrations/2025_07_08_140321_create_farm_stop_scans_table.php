@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('farm_stop_scans', function (Blueprint $table) {
             $table->id();
             $table->string('tracking_id');
-            $table->string('tank_id');
-            $table->string('farm_id');
+            $table->foreignId('tank_id');
+            $table->foreignId('farm_id');
             $table->string('patron_id');
+            $table->decimal('collected_milk');
             $table->enum('method',['Stick Reading','Scale At Plant','Estimated Value','Scale At Farm']);
             $table->timestamps();
         });

@@ -304,6 +304,10 @@
 
         let tankHeight, tankWidth, tankRadius, tankLength, tankType;
         $('#checkBtn').click(function() {
+            trackingID = "";
+            farmID = "";
+            tankID = "";
+            patronID = "";
             status.display = "block";
             status.innerHTML = "Please Wait...";
             for (let i = 0; i < result.length; i++) {
@@ -355,7 +359,7 @@
                         tankWidth = response.width;
                         tankType = response.type;
                         showMethod.style.display = "block";
-
+                        status.innerHTML = "Please Fill in the Values";
                     }
                     else{
                         showMethod.style.display = "block";
@@ -389,6 +393,7 @@
         function selectMethod() {
             let method = document.getElementById("method").value;
             meth.value = method;
+            
 
             // console.log(meth.value);
             if (method == "Stick Reading") {

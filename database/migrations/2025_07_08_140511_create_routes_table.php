@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
             $table->string('route_number')->unique();
-            $table->foreignId('hauler_id')->constrained();
+            $table->foreignId('hauler_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
