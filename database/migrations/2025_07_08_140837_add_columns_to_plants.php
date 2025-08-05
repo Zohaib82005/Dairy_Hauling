@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('plants', function (Blueprint $table) {
             $table->string('email');
-            $table->decimal('latitude');
-            $table->decimal('longitude');  
+            $table->decimal('latitude', total: 8, places: 6);
+            $table->decimal('longitude', total: 8, places: 6);  
         });
     }
 

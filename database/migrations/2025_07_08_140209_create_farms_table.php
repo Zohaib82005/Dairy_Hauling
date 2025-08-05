@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('farm_id');
             $table->string('patron_id');
-            $table->decimal('latitude');
-            $table->decimal('longitude');
+            $table->decimal('latitude', total: 8, places: 6);
+            $table->decimal('longitude', total: 8, places: 6);
             $table->timestamps();
         });
     }

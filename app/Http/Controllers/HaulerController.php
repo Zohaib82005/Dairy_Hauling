@@ -228,7 +228,7 @@ class HaulerController extends Controller
             'hauler_id' => $data['hauler_id']
         ]);
 
-return redirect('/viewHauler/'.session('haulerId'));
+        return redirect('/viewHauler/'.session('haulerId'));
     }
 
     public function deleteTruck($id)
@@ -323,7 +323,6 @@ return redirect('/viewHauler/'.session('haulerId'));
         ]);
         if($sent){
             return response()->json(['status'=>"Sent"]);
-            
         }
         return response()->json(['status'=>"not Sent"]);
     }
@@ -349,6 +348,7 @@ return redirect('/viewHauler/'.session('haulerId'));
     }
 
     public function getUserProgress($id){
+        
         $userProgress = Farm_stop_scan::join('farms','farm_stop_scans.farm_id','=','farms.farm_id')
                         ->join('tickets','farm_stop_scans.ticket_id','=','tickets.id')
                         ->select('farm_stop_scans.created_at as stopTime','farms.name as fname','collected_milk as totalMilk')->where('farm_stop_scans.user_id',$id)->where('status','active')->get();

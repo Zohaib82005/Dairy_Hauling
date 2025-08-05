@@ -270,7 +270,7 @@
                             <a href="{{ route('admin.editDriver', $user->uid) }}"
                                 class="btn btn-primary mx-2">Edit</a><a
                                 href="{{ route('admin.deleteDriver', $user->uid) }}"
-                                class="btn btn-danger">Delete</a>
+                                class="btn btn-danger deleteThing">Delete</a>
                             {{-- <a href="{{  }}" class="btn btn-success">Location</a> --}}
                             <!-- Small modal -->
                             <button type="button" class="btn btn-success" id="viewLocation-{{ $index }}"
@@ -356,7 +356,7 @@
                                         <td><a href="{{ route('admin.editHauler', $hauler->id) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.deleteHauler', $hauler->id) }}"
-                                                class="btn btn-danger">Delete</a> <a
+                                                class="btn btn-danger deleteThing">Delete</a> <a
                                                 href="{{ route('hauler.adminSide.login', $hauler->id) }}"
                                                 class="btn btn-success">Login</a></td>
                                     </tr>
@@ -391,7 +391,7 @@
                                         <td><a href="{{ route('admin.editTruck', $truck->tid) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.deleteTruck', $truck->tid) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -425,7 +425,7 @@
                                         <td><a href="{{ route('admin.edit.Trailer', $trailer->trid) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.delete.trailer', $trailer->trid) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -457,7 +457,7 @@
                                         <td><a href="{{ route('admin.edit.route', $route->rid) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.delete.route', $route->rid) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -493,7 +493,7 @@
                                         <td><a href="{{ route('admin.edit.farm', $farm->fid) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.delete.farm', $farm->fid) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -528,7 +528,7 @@
                                         <td><a href="{{ route('admin.edit.tank', $tank->tankid) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.delete.tank', $tank->tankid) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -564,7 +564,7 @@
                                         <td><a href="{{ route('admin.edit.plant', $plant->id) }}"
                                                 class="btn btn-primary">Edit</a> <a
                                                 href="{{ route('admin.delete.plant', $plant->id) }}"
-                                                class="btn btn-danger">Delete</a></td>
+                                                class="btn btn-danger deleteThing">Delete</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -611,11 +611,6 @@
         </div>
     </div>
 
-
-
-
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -626,8 +621,20 @@
         function setPrice() {
             price = document.getElementById('price').value;
             totalPrice = price * totalMilk;
-            document.getElementById('showPrice').innerHTML = "$" + totalPrice;
+            document.getElementById('showPrice').innerHTML = "$ " + totalPrice;
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.deleteThing').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); 
+                const proceed = confirm("Are you sure?");
+                if (proceed) {
+                    window.location.href = this.href;
+                }
+            });
+        });
+    });
 
         // Tab functionality
         document.querySelectorAll('.nav-link').forEach(link => {

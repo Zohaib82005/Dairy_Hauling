@@ -312,11 +312,9 @@ session()->put('arrivalTime', $formattedTime);
         document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('.confirm-link').forEach(link => {
             link.addEventListener('click', function (e) {
-                e.preventDefault(); // Stop the default navigation
+                e.preventDefault(); 
                 const proceed = confirm("Are you sure you want to close the load?");
                 if (proceed) {
-                    // Optional: Call any function like closeLoad()
-                    // Then navigate manually
                     window.location.href = this.href;
                 }
             });
