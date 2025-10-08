@@ -22,7 +22,7 @@
         @endif
         {{-- @foreach ($user as $u) --}}
             
-        <form action="{{ route('admin.update.farm',$farm->id) }}" method="POST" class="m-5 p-5 border shadow-lg">
+        <form action="{{ route('admin.update.farm',$farm->fid) }}" method="POST" class="m-5 p-5 border shadow-lg">
             @csrf
             <div class="row">
                 
@@ -58,7 +58,17 @@
                         <label for="long">Longitude</label>
                     </div>
                 </div>
-                
+                <div class="col-12">
+                    <div class="form-floating">
+                        <select name="route_numb" id="routenumb" class="form-control">
+                            <option selected disabled value="{{ $farm->rid }}">{{ $farm->route_number }}</option>
+                            @foreach ($routes as $route)
+                                <option value="{{ $route->id }}">{{$route->route_number}}</option>
+                            @endforeach
+                        </select>
+                        <label for="routenumb" class="form-label">Route Number</label>
+                    </div>
+                </div>
                 
                 <div class="col-12">
                     <div class="form-floating text-center">

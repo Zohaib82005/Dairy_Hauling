@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Futuristic Student Profile — Bootstrap</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg1: #060714;
+            --bg2: #0b0f1a;
+            --accent: #7c5cff;
+            /* purple */
+            --accent-2: #00e0b8;
+            /* teal */
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-2: rgba(255, 255, 255, 0.02);
+            --muted: rgba(255, 255, 255, 0.65);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(1000px 600px at 10% 10%, rgba(124, 92, 255, 0.12), transparent),
+                radial-gradient(800px 500px at 90% 90%, rgba(0, 224, 184, 0.06), transparent),
+                linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #eaf0ff;
+            padding: 40px 16px;
+        }
+
+        /* Center container */
+        .profile-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            backdrop-filter: blur(6px) saturate(1.1);
+        }
+
+        /* Glass card */
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        }
+
+        .avatar-wrap {
+            width: 140px;
+            height: 140px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(124, 92, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
+
+        .neon-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 18px;
+            background: conic-gradient(from 120deg, rgba(124, 92, 255, 0.15), rgba(0, 224, 184, 0.12), rgba(124, 92, 255, 0.08));
+            filter: blur(18px);
+            z-index: -1;
+            opacity: 0.9
+        }
+
+        h1.name {
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            margin-bottom: 6px
+        }
+
+        .role {
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        .accent-badge {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            color: #041022
+        }
+
+        /* stats */
+        .stat {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        .stat h3 {
+            margin: 0;
+            font-size: 20px
+        }
+
+        .stat p {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        /* progress + skills */
+        .skill-name {
+            font-weight: 600
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06)
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        }
+
+        /* timeline */
+        .timeline {
+            position: relative;
+            padding-left: 22px
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            opacity: 0.12;
+            border-radius: 4px
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 12px 12px 12px 26px;
+            margin-bottom: 10px
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 12px rgba(124, 92, 255, 0.22)
+        }
+
+        /* footer */
+        .btn-neon {
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
+            border: 0;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: #041022;
+            box-shadow: 0 8px 30px rgba(7, 10, 25, 0.6)
+        }
+
+        /* small screens */
+        @media (max-width:768px) {
+            .avatar-wrap {
+                width: 110px;
+                height: 110px
+            }
+        }
+
+        /* subtle animated background shapes */
+        .floating-shape {
+            position: absolute;
+            right: -80px;
+            top: -40px;
+            width: 300px;
+            height: 300px;
+            border-radius: 30%;
+            filter: blur(80px);
+            opacity: 0.06;
+            background: linear-gradient(45deg, var(--accent), var(--accent-2));
+            transform: rotate(15deg)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-wrap position-relative">
+        <div class="floating-shape" aria-hidden="true"></div>
+
+        <div class="glass-card p-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3 d-flex flex-column align-items-center text-center">
+                    <div class="avatar-wrap mb-3">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=60"
+                            alt="avatar">
+                        <div class="neon-ring"></div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-outline-light" href="#"><i class="bi bi-envelope-fill"></i></a>
+                        <a class="btn btn-sm btn-outline-light" href="#"><i class="bi bi-linkedin"></i></a>
+                        <a class="btn btn-sm btn-outline-light" href="#"><i class="bi bi-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h1 class="name">Aisha Khan <span class="ms-2 badge bg-transparent accent-badge">CS Student</span>
+                    </h1>
+                    <div class="role mb-2">Undergraduate • FAST-NUCES • Year 3</div>
+                    <p class="text-muted" style="color:var(--muted);">A passionate software developer focusing on web &
+                        AI. Loves building elegant UIs, optimizing algorithms, and learning new tech stacks. Currently
+                        exploring React, Laravel, and on-device ML.</p>
+
+                    <div class="mt-3">
+                        <div class="row g-2">
+                            <div class="col-6 stat">
+                                <h3>3.85</h3>
+                                <p>CGPA</p>
+                            </div>
+                            <div class="col-6 stat">
+                                <h3>12+</h3>
+                                <p>Projects</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+                    <div class="glass-card p-3 h-100">
+                        <h6 class="mb-3">Contact</h6>
+                        <p class="mb-1" style="color:var(--muted)"><i class="bi bi-geo-alt-fill me-2"></i>Karachi,
+                            Pakistan</p>
+                        <p class="mb-1" style="color:var(--muted)"><i
+                                class="bi bi-envelope-fill me-2"></i>aisha.k@example.com</p>
+                        <p class="mb-1" style="color:var(--muted)"><i class="bi bi-phone-fill me-2"></i>+92 300 1234567
+                        </p>
+                        <div class="mt-3 d-grid">
+                            <a class="btn btn-sm btn-neon" href="#">Download CV <i class="bi bi-download ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row mt-4 g-3">
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <h5 class="mb-3">Skills & Tools</h5>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <div class="skill-name">Laravel</div>
+                            <div class="text-muted">85%</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width:85%" aria-valuenow="85"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <div class="skill-name">React</div>
+                            <div class="text-muted">72%</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width:72%" aria-valuenow="72"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <div class="skill-name">Python / ML</div>
+                            <div class="text-muted">68%</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width:68%" aria-valuenow="68"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" style="border-color:rgba(255,255,255,0.04)">
+
+                    <h6 class="mb-2">Top Projects</h6>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="p-3"
+                            style="background:var(--glass);border-radius:10px;border:1px solid rgba(255,255,255,0.02)">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="fw-bold">Uni Notes — Laravel Marketplace</div>
+                                    <small class="text-muted">Store where students buy view-only notes
+                                        (JazzCash/EasyPaisa)</small>
+                                </div>
+                                <div class="text-muted small">2025</div>
+                            </div>
+                        </div>
+
+                        <div class="p-3"
+                            style="background:var(--glass);border-radius:10px;border:1px solid rgba(255,255,255,0.02)">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="fw-bold">Adventure Quest — C++ OOP Game</div>
+                                    <small class="text-muted">Terminal-based 2-player board game</small>
+                                </div>
+                                <div class="text-muted small">2025</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="glass-card p-4">
+                    <h5 class="mb-3">Education & Experience</h5>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="fw-bold">FAST-NUCES</div>
+                            <div class="text-muted small">BS Computer Science — 2023 — Present</div>
+                            <p class="mt-2" style="color:var(--muted)">Focused on software engineering, data structures,
+                                and machine learning coursework.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="fw-bold">Intern — Web Dev</div>
+                            <div class="text-muted small">ABC Tech — Summer 2024</div>
+                            <p class="mt-2" style="color:var(--muted)">Built internal dashboard features using Laravel
+                                and Vue components.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="fw-bold">Open Source Contributor</div>
+                            <div class="text-muted small">2024 — Present</div>
+                            <p class="mt-2" style="color:var(--muted)">Contributed patches and docs to developer tooling
+                                projects on GitHub.</p>
+                        </div>
+                    </div>
+
+                    <hr style="border-color:rgba(255,255,255,0.04)">
+                    <h6 class="mb-3">Languages</h6>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge bg-transparent"
+                            style="border:1px solid rgba(255,255,255,0.04);padding:8px 10px">English</span>
+                        <span class="badge bg-transparent"
+                            style="border:1px solid rgba(255,255,255,0.04);padding:8px 10px">Urdu</span>
+                        <span class="badge bg-transparent"
+                            style="border:1px solid rgba(255,255,255,0.04);padding:8px 10px">Punjabi</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-4 text-center text-muted small">Designed with ❤️ — customize the content & colors. Built with
+            Bootstrap 5.</footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // small interactive touches
+        document.querySelectorAll('.avatar-wrap img').forEach(img => {
+            img.addEventListener('mouseenter', () => img.style.transform = 'scale(1.03)');
+            img.addEventListener('mouseleave', () => img.style.transform = 'scale(1)');
+            img.style.transition = 'transform .35s ease';
+        });
+    </script>
+</body>
+
+</html>

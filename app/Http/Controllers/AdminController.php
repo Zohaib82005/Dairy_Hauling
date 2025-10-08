@@ -293,8 +293,10 @@ class AdminController extends Controller
 
     public function editFarm($id)
     {
-        $farm = Farm::select('id', 'name', 'farm_id', 'patron_id', 'latitude', 'longitude')->where('id', $id)->first();
-        return view('admin.editFarms', compact('farm'));
+        $farm = Farm::join('routes','farms.route_id','=','routes.id')
+                ->select('farms.id as fid','routes.id as rid','route_number', 'name', 'farm_id', 'patron_id', 'latitude', 'longitude')->where('farms.id', $id)->first();
+        $routes = Route::select('id','route_number')->get();
+        return view('admin.editFarms', compact('farm','routes'));
     }
 
     public function deleteFarm($id)

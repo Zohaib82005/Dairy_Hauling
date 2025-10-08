@@ -430,9 +430,8 @@
             });
         }
         // viewMessage();
-        setInterval(viewMessage, 900);
-
-
+        
+        
         let cpalert = document.getElementById("completeProfileAlert");
         let ticket = document.getElementById("ticket");
         let chatBtn = document.getElementById("chatBtn");
@@ -442,6 +441,7 @@
         } else {
             ticket.classList.remove('disabled');
             chatBtn.classList.remove('disabled');
+            setInterval(viewMessage, 900);
         }
 
         function showTicketAlert() {
